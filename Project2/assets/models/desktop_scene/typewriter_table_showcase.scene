@@ -1,0 +1,79 @@
+# Showcase scene for the imported typewriter with the full table model.
+#
+# Run from Project2/:
+#   ./build/Project2Renderer assets/models/desktop_scene typewriter_table_showcase 800x600 64
+
+render {
+    width   = 960
+    height  = 720
+    spp     = 64
+    depth   = 8
+    shadows = true
+    bg      = 0.055 0.055 0.058
+}
+
+camera {
+    # Tighter three-quarter framing that keeps the desk context readable.
+    pos       = 0.162 0.134 0.194
+    lookAt    = 0.026 0.073 0.002
+    up        = 0.0 1.0 0.0
+    fov       = 25
+    aperture  = 0.0
+    focus     = 0.228
+}
+
+envmap "../../envmaps/typewriter_studio_soft.hdr" {
+    intensity = 0.18
+}
+
+mesh "table/table.obj" {
+    materialMap = "table/table.materialmap"
+    offset      = 0.000 0.000 -0.008
+}
+
+mesh "typewriter/typewriter.obj" {
+    materialMap = "typewriter/typewriter.materialmap"
+    offset      = 0.024 0.062 -0.002
+    rotation    = 0.000 180.000 0.000
+}
+
+light {
+    type      = AREA_DISK
+    pos       = 0.028 0.118 0.002
+    normal    = 0.000 -1.000 0.000
+    radius    = 0.040
+    emission  = 1.00 0.97 0.92
+    intensity = 16.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_DISK
+    pos       = -0.020 0.090 0.050
+    normal    = 0.420 -0.880 -0.220
+    radius    = 0.028
+    emission  = 1.00 0.93 0.86
+    intensity = 6.5
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = 0.086 0.082 -0.022
+    radius    = 0.015
+    emission  = 0.88 0.92 1.00
+    intensity = 4.0
+    enabled   = true
+}
+
+light {
+    type        = SPOT
+    pos         = 0.115 0.115 0.075
+    dir         = -0.720 -0.620 -0.310
+    emission    = 0.98 0.96 1.00
+    intensity   = 0.0009
+    innerAngle  = 14.0
+    outerAngle  = 26.0
+    range       = 0.26
+    enabled   = true
+}

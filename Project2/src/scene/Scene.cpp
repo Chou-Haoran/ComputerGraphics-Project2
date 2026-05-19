@@ -1,0 +1,237 @@
+#include "Scene.hpp"
+#include "Material.hpp"
+#include <algorithm>
+#include <cmath>
+
+namespace {
+Vector3f offsetRayOrigin(const Vector3f& point, const Vector3f& normal, const Vector3f& dir)
+{
+    return dotProduct(dir, normal) < 0 ? point - normal * EPSILON
+                                       : point + normal * EPSILON;
+}
+
+float powerHeuristic(float pdfA, float pdfB)
+{
+    float a2 = pdfA * pdfA;
+    float b2 = pdfB * pdfB;
+    return a2 / std::max(a2 + b2, 1e-8f);
+}
+}
+
+void Scene::AddLight(std::unique_ptr<Light> light)
+{
+    if (!light) return;
+
+    analyticLightWeightSum += std::max(light->samplingWeight(), 1e-4f);
+    analyticLightCdf.push_back(analyticLightWeightSum);
+    analyticLights.push_back(std::move(light));
+}
+
+void Scene::buildBVH() {
+    if (!ENABLE_BVH) {
+        bvh = nullptr;
+        printf(" - BVH disabled, using brute-force intersections...\n\n");
+        return;
+    }
+    printf(" - Generating BVH...\n\n");
+    bvh = new BVHAccel(objects, 1, BVHAccel::SplitMethod::NAIVE);
+}
+
+Intersection Scene::intersect(const Ray& ray) const
+{
+    if (ENABLE_BVH && bvh) return bvh->Intersect(ray);
+
+    Intersection closest;
+    for (auto* obj : objects) {
+        Intersection hit = obj->getIntersection(ray);
+        if (hit.happened && hit.tnear < closest.tnear) closest = hit;
+    }
+    return closest;
+}
+
+void Scene::sampleLight(Intersection& pos, float& pdf) const
+{
+    pos = Intersection();
+    pdf = 0.0f;
+    float emit_area_sum = 0;
+    for (auto* obj : objects) {
+        if (obj->hasEmit()) {
+            pos.happened = true;
+            emit_area_sum += obj->getArea();
+        }
+    }
+    float p = get_random_float() * emit_area_sum;
+    emit_area_sum = 0;
+    for (auto* obj : objects) {
+        if (obj->hasEmit()) {
+            emit_area_sum += obj->getArea();
+            if (p <= emit_area_sum) {
+                obj->Sample(pos, pdf);
+                break;
+            }
+        }
+    }
+}
+
+int Scene::sampleAnalyticLight(float u, float& pickPdf) const
+{
+    pickPdf = 0.0f;
+    if (analyticLights.empty() || analyticLightWeightSum <= 0.0f) return -1;
+
+    float target = clamp(0.0f, 1.0f - 1e-6f, u) * analyticLightWeightSum;
+    auto it = std::upper_bound(analyticLightCdf.begin(), analyticLightCdf.end(), target);
+    size_t index = static_cast<size_t>(std::distance(analyticLightCdf.begin(), it));
+    if (index >= analyticLights.size()) {
+        index = analyticLights.size() - 1;
+    }
+
+    float cdfPrev = index == 0 ? 0.0f : analyticLightCdf[index - 1];
+    float weight = std::max(analyticLightCdf[index] - cdfPrev, 1e-4f);
+    pickPdf = weight / analyticLightWeightSum;
+    return static_cast<int>(index);
+}
+
+// Monte Carlo path tracer. Direct lighting combines sampled emissive geometry
+// with analytic lights (point / spot / directional); indirect uses
+// cosine-weighted hemisphere + Russian Roulette. Mirror & glass branch out
+// with Fresnel-weighted reflection/refraction.
+Vector3f Scene::castRay(const Ray& ray, int depth) const
+{
+    auto inter = intersect(ray);
+
+    if (!inter.happened) {
+        // PDF user-control (vi): environment map for the miss path.
+        if (envmap && envmap->valid()) {
+            return envmap->sample(normalize(ray.direction));
+        }
+        return backgroundColor;
+    }
+
+    Vector3f hitPoint   = inter.coords;
+    Vector2f st         = inter.tcoords;
+    Vector3f N          = normalize(inter.normal);
+    Vector3f viewDir    = normalize(-ray.direction);
+    Vector3f surfaceCol = inter.obj->evalDiffuseColor(st);
+    if (inter.material->normalTexture && inter.material->normalTexture->valid()) {
+        N = inter.material->applyNormalMap(st.x, st.y, N, inter.tangent, inter.bitangent);
+        if (dotProduct(N, viewDir) < 0.0f) N = -N;
+    }
+    float surfaceRoughness = inter.material->getRoughnessAt(st.x, st.y);
+    MaterialInteraction interaction = inter.material->resolveInteraction(ray.direction, N);
+    if (interaction.kind == MaterialInteractionKind::Emission) {
+        return interaction.emission;
+    }
+
+    if (depth >= maxDepth) return Vector3f(0);
+
+    if (interaction.kind == MaterialInteractionKind::Delta) {
+        Vector3f radiance(0.0f);
+        for (int i = 0; i < interaction.bounceCount; ++i) {
+            const MaterialDeltaBounce& bounce = interaction.bounces[i];
+            if (dotProduct(bounce.direction, bounce.direction) < EPSILON ||
+                dotProduct(bounce.throughput, bounce.throughput) < EPSILON) continue;
+            radiance += bounce.throughput *
+                        castRay(Ray(offsetRayOrigin(hitPoint, N, bounce.direction),
+                                    bounce.direction), depth + 1);
+        }
+        return radiance;
+    }
+
+    Vector3f directLight(0), indirectLight(0);
+
+    float lightPickPdf = 0.0f;
+    int lightIndex = sampleAnalyticLight(get_random_float(), lightPickPdf);
+    if (lightIndex >= 0 && lightPickPdf > 0.0f) {
+        const auto& light = analyticLights[static_cast<size_t>(lightIndex)];
+        LightSample sample;
+        if (light && light->sampleLi(hitPoint, sample)) {
+            float analyticCosTheta = std::max(0.0f, dotProduct(N, sample.direction));
+            if (analyticCosTheta > 0.0f) {
+                bool visible = true;
+                if (shadowsEnabled) {
+                    Ray shadowRay(offsetRayOrigin(hitPoint, N, sample.direction), sample.direction);
+                    Intersection shadowHit = intersect(shadowRay);
+                    if (sample.infiniteDistance) {
+                        visible = !shadowHit.happened;
+                    } else {
+                        visible = !shadowHit.happened ||
+                                  shadowHit.tnear + 5.0f * EPSILON >= sample.maxDistance;
+                    }
+                }
+
+                if (visible) {
+                    Vector3f brdf = inter.material->eval(viewDir, sample.direction, N,
+                                                         surfaceCol, surfaceRoughness);
+                    float lightPdf = sample.pdf * lightPickPdf;
+                    float weight = 1.0f;
+                    if (!sample.delta) {
+                        float bsdfPdf = inter.material->pdf(viewDir, sample.direction, N, surfaceRoughness);
+                        weight = powerHeuristic(lightPdf, bsdfPdf);
+                    }
+
+                    directLight += sample.radiance * brdf * analyticCosTheta * weight /
+                                   std::max(lightPdf, 1e-8f);
+                }
+            }
+        }
+    }
+
+    if (envmap && envmap->valid()) {
+        Vector3f envDir(0.0f);
+        Vector3f envRadiance(0.0f);
+        float envPdf = 0.0f;
+        if (envmap->sampleDirection(envDir, envRadiance, envPdf)) {
+            float envCosTheta = std::max(0.0f, dotProduct(N, envDir));
+            if (envCosTheta > 0.0f && envPdf > 0.0f) {
+                bool visible = true;
+                if (shadowsEnabled) {
+                    Ray shadowRay(offsetRayOrigin(hitPoint, N, envDir), envDir);
+                    Intersection shadowHit = intersect(shadowRay);
+                    visible = !shadowHit.happened;
+                }
+
+                if (visible) {
+                    Vector3f brdf = inter.material->eval(viewDir, envDir, N,
+                                                         surfaceCol, surfaceRoughness);
+                    float bsdfPdf = inter.material->pdf(viewDir, envDir, N, surfaceRoughness);
+                    float weight = powerHeuristic(envPdf, bsdfPdf);
+                    directLight += envRadiance * brdf * envCosTheta * weight /
+                                   std::max(envPdf, 1e-8f);
+                }
+            }
+        }
+    }
+
+    if (get_random_float() < RussianRoulette) {
+        Vector3f sampleDir = normalize(inter.material->sample(viewDir, N, surfaceRoughness));
+        float    pdf       = inter.material->pdf(viewDir, sampleDir, N, surfaceRoughness);
+        float    cosSample = std::max(0.0f, dotProduct(N, sampleDir));
+        if (pdf > 1e-8f && cosSample > 0.0f) {
+            Ray nextRay(offsetRayOrigin(hitPoint, N, sampleDir), sampleDir);
+            Intersection nextInter = intersect(nextRay);
+            if (!nextInter.happened) {
+                Vector3f missRadiance(0.0f);
+                if (envmap && envmap->valid()) {
+                    missRadiance = envmap->sample(sampleDir);
+                    float envPdf = envmap->pdf(sampleDir);
+                    float weight = powerHeuristic(pdf, envPdf);
+                    Vector3f brdf = inter.material->eval(viewDir, sampleDir, N,
+                                                         surfaceCol, surfaceRoughness);
+                    indirectLight = missRadiance * brdf * cosSample * weight /
+                                    (pdf * RussianRoulette);
+                } else {
+                    Vector3f brdf = inter.material->eval(viewDir, sampleDir, N,
+                                                         surfaceCol, surfaceRoughness);
+                    indirectLight = castRay(nextRay, depth + 1) *
+                                    brdf * cosSample / (pdf * RussianRoulette);
+                }
+            } else if (!nextInter.material->hasEmission()) {
+                Vector3f brdf = inter.material->eval(viewDir, sampleDir, N,
+                                                     surfaceCol, surfaceRoughness);
+                indirectLight = castRay(nextRay, depth + 1) *
+                                brdf * cosSample / (pdf * RussianRoulette);
+            }
+        }
+    }
+    return directLight + indirectLight;
+}

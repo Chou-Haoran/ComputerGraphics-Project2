@@ -1,0 +1,14 @@
+materialMap {
+    defaultType = MICROFACET
+    defaultRoughnessMin = 0.28
+}
+
+mtl "Table_mat" {
+    type = MICROFACET
+    color = 0.82 0.68 0.50
+    roughness = 0.44
+    Ks = 0.10
+    diffuseTex = "textures/Table_mat_baseColor.jpg"
+    bumpTex = "textures/Table_mat_normal.jpg"
+    bumpScale = 0.06
+}

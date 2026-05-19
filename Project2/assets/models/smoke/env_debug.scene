@@ -1,0 +1,19 @@
+render {
+    width   = 320
+    height  = 160
+    spp     = 1
+    depth   = 2
+    shadows = false
+    bg      = 0.00 0.00 0.00
+}
+
+camera {
+    pos     = 0.0 0.0 0.0
+    lookAt  = 1.0 0.0 0.0
+    up      = 0.0 1.0 0.0
+    fov     = 80
+}
+
+envmap "../../envmaps/debug_gradient.hdr" {
+    intensity = 1.0
+}

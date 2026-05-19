@@ -1,0 +1,40 @@
+# Side view of the vintage desktop scene (PDF requirement: second
+# viewpoint of the same scene). Same geometry as front.scene; only the
+# camera block differs.
+
+render {
+    width   = 1024
+    height  = 768
+    spp     = 256
+    depth   = 8
+    shadows = true
+    bg      = 0.02 0.02 0.025
+}
+
+camera {
+    # ~70 degrees clockwise from the front view, lifted slightly to keep
+    # the paper edge readable.
+    pos       = -1.00 0.40 -0.40
+    lookAt    =  0.00 0.10  0.00
+    up        =  0.00 1.00  0.00
+    fov       = 35
+    aperture  = 0.012
+    focus     = 1.05
+}
+
+envmap "../../envmaps/studio_warm_2k.hdr" {
+    intensity = 0.4
+}
+
+mesh "table.obj"      { material = MICROFACET color = 0.45 0.30 0.20 roughness = 0.45 diffuseTex = "../../textures/wood_diffuse.png" normalTex = "../../textures/wood_normal.png" }
+mesh "typewriter/typewriter.obj" { }
+mesh "phone.obj"      { material = MICROFACET color = 0.05 0.05 0.05 roughness = 0.20 }
+mesh "paper.obj"      { material = DIFFUSE    color = 0.95 0.92 0.88 diffuseTex = "../../textures/paper_diffuse.png" }
+
+light {
+    pos       = 0.0 0.80 0.0
+    size      = 0.30 0.30 0.0
+    emission  = 1.00 0.95 0.85
+    intensity = 35.0
+    enabled   = true
+}

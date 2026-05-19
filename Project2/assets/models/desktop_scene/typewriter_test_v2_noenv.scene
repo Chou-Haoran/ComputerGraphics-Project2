@@ -1,0 +1,66 @@
+# Single-object pipeline smoke test for the imported typewriter asset.
+# Expected asset location:
+#   assets/models/desktop_scene/typewriter/typewriter.obj
+#
+# Run from Project2/:
+#   ./build/Project2Renderer assets/models/desktop_scene typewriter_test_v2_noenv 800x600 64
+#
+# If the model appears off-screen, first adjust `camera.pos` / `camera.lookAt`.
+# If the OBJ was exported away from the origin, use `offset` in the mesh block.
+
+render {
+    width   = 960
+    height  = 720
+    spp     = 64
+    depth   = 8
+    shadows = true
+    bg      = 0.028 0.028 0.032
+}
+
+camera {
+    pos       = 0.000 0.023 0.115
+    lookAt    = 0.000 0.015 0.000
+    up        = 0.0 1.00  0.00
+    fov       = 26
+    aperture  = 0.0
+    focus     = 0.115
+}
+
+mesh "typewriter/typewriter.obj" {
+    # Leave this block mostly empty so the imported OBJ/MTL pair drives
+    # the model's default material split and diffuse textures.
+    materialMap = "typewriter/typewriter.materialmap"
+    #
+    # Optional override examples:
+    # material  = MICROFACET
+    # roughness = 0.25
+    # bumpTex   = "typewriter/textures/surface_height.png"
+    # bumpScale = 0.08
+    #
+    # Optional origin correction if the exported mesh is offset:
+    # offset = 0.0 -0.1 0.0
+}
+
+light {
+    pos       = -0.010 0.085 -0.030
+    size      = 0.070 0.055 0.0
+    emission  = 1.00 0.97 0.90
+    intensity = 18.0
+    enabled   = true
+}
+
+light {
+    pos       = 0.060 0.050 -0.045
+    size      = 0.032 0.032 0.0
+    emission  = 0.85 0.90 1.00
+    intensity = 5.0
+    enabled   = true
+}
+
+light {
+    pos       = -0.055 0.045 0.030
+    size      = 0.025 0.025 0.0
+    emission  = 1.00 0.92 0.82
+    intensity = 4.0
+    enabled   = true
+}

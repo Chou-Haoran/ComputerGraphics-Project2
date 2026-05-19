@@ -1,0 +1,73 @@
+materialMap {
+    defaultType = MICROFACET
+    defaultRoughnessMin = 0.12
+}
+
+# Material test map: intentionally non-physical in places so each supported
+# material model reads clearly on one asset.
+
+mtl "17_-_Default" {
+    type = MICROFACET
+    color = 0.34 0.36 0.40
+    roughness = 0.22
+    Ks = 0.18
+}
+
+mtl "Material_#51" {
+    type = DIFFUSE
+    color = 0.62 0.62 0.60
+    Ks = 0.0
+}
+
+mtl "Metal_Chrome" {
+    type = MIRROR
+    color = 0.95 0.95 0.95
+}
+
+mtl "Royal_typewriter_Buttons" {
+    type = DIFFUSE
+    color = 1.00 1.00 0.98
+    Ks = 0.0
+}
+
+mtl "Royal_typewriter_Label" {
+    type = EMIT
+    emission = 6.5 4.2 2.0
+}
+
+mtl "Royal_typewriter_Measure" {
+    type = METAL
+    color = 0.88 0.42 0.26
+    roughness = 0.08
+    Ks = 0.98
+}
+
+mtl "Royal_typewriter_Metal_black" {
+    type = METAL
+    color = 0.54 0.56 0.60
+    roughness = 0.12
+    Ks = 0.94
+}
+
+mtl "Royal_typewriter_Paper" {
+    type = GLASS
+    ior = 1.18
+}
+
+mtl "Royal_typewriter_Plastic" {
+    type = MICROFACET
+    color = 0.82 0.64 0.38
+    roughness = 0.34
+    Ks = 0.16
+}
+
+mtl "Royal_typewriter_Rubber" {
+    type = DIFFUSE
+    color = 0.22 0.22 0.20
+    Ks = 0.0
+}
+
+mtl "Royal_typewriter_Tape" {
+    type = GLASS
+    ior = 1.08
+}

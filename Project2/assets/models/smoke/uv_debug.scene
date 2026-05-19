@@ -1,0 +1,32 @@
+# Stable UV debug view. The whole floor quad should show the four
+# texels from smoke_checker.ppm without depending on the old top-down
+# camera setup that currently regresses to a black frame.
+render {
+    width   = 256
+    height  = 256
+    spp     = 8
+    depth   = 4
+    shadows = false
+    bg      = 0.02 0.02 0.03
+}
+
+camera {
+    pos     = 0.0 0.6 -1.8
+    lookAt  = 0.0 0.0 0.0
+    up      = 0.0 1.0 0.0
+    fov     = 40
+}
+
+mesh "floor_uv.obj" {
+    material   = DIFFUSE
+    color      = 1.0 1.0 1.0
+    diffuseTex = "../../textures/smoke_checker.ppm"
+}
+
+light {
+    pos       = 0.0 1.2 0.0
+    size      = 0.6 0.6 0.0
+    emission  = 1.0 1.0 1.0
+    intensity = 15.0
+    enabled   = true
+}

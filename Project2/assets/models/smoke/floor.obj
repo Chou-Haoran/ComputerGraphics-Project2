@@ -1,0 +1,9 @@
+# Minimal floor quad (2 m x 2 m at y=0, normal +Y).
+# Single-space columns: OBJ_Loader.hpp splits naively on " " and trips on
+# double spaces.
+v -1.0 0.0 -1.0
+v 1.0 0.0 -1.0
+v 1.0 0.0 1.0
+v -1.0 0.0 1.0
+f 1 4 2
+f 4 3 2
