@@ -1,9 +1,4 @@
 build/
-output/*
-!output/.gitkeep
-*.ppm
-*.png
-*.hdr
 *.DS_Store
 .cache/
 .vscode/
