@@ -1,0 +1,224 @@
+# Blender 5.0.1 MTL File: 'blender.blend'
+# www.blender.org
+
+newmtl Ceiling
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/T_Celing_01_A.tga.png
+map_Ns C:/T_Celing_01_R.tga.png
+map_Bump -bm 1.000000 C:/T_Celing_01_N.tga.png
+
+newmtl Curtain
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/T_Curtain_01_A.tga.png
+map_Ns C:/T_Curtain_01_R.jpg
+map_Bump -bm 1.000000 C:/T_Curtain_01_N.tga.png
+
+newmtl Floor
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/T_Floor_01_A.tga.png
+map_Ns C:/T_Floor_01_R.tga.png
+map_Bump -bm 1.000000 C:/T_Floor_01_N.tga.png
+
+newmtl Gass
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd C:/T_Glass_01_A.tga.png
+map_Ns C:/T_Glass_01_R.tga.png
+map_d C:/T_Glass_01_Opacity.tga.png
+map_Bump -bm 1.000000 C:/T_Glass_01_N.tga.png
+
+newmtl Lampshade
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/T_Lampshade_01_A.tga.png
+map_Ns C:/T_Lampshade_01_R.tga.png
+map_Bump -bm 1.000000 C:/T_Lampshade_01_N.tga.png
+
+newmtl Material_#51
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+
+newmtl Metal_Chrome
+Ns 39.999996
+Ka 1.000000 1.000000 1.000000
+Kd 0.439216 0.439216 0.439216
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Prop01
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/T_Props_01_A.tga.png
+map_Ns C:/T_Props_01_R.tga.png
+map_refl C:/T_Props_01_M.tga.png
+map_Bump -bm 1.000000 C:/T_Props_01_N.tga.png
+
+newmtl Prop02
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/T_Props_02_A.tga.png
+map_Ns C:/T_Props_02_R.tga.png
+map_refl C:/T_Props_02_M.tga.png
+map_Bump -bm 1.000000 C:/T_Props_02_N.tga.png
+
+newmtl Prop03
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/T_Props_03_A.tga.png
+map_Ns C:/T_Props_03_R.tga.png
+map_refl C:/T_Props_03_M.tga.png
+map_Ke C:/T_Props_03_E.tga.png
+map_Bump -bm 1.000000 C:/T_Props_03_N.tga.png
+
+newmtl Royal_typewriter_Base_color
+Ns 49.245770
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Royal_typewriter_Base_color.001
+Ns 49.245770
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Royal_typewriter_Buttons
+Ns 1000.000000
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd E:/OneDrive/_Aus/_ANU Study/26S1/CG/Research_Project2/model/typewriter/source/Typewriter/Royal typewriter buttons.jpg
+
+newmtl Royal_typewriter_Label
+Ns 1000.000000
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd E:/OneDrive/_Aus/_ANU Study/26S1/CG/Research_Project2/model/typewriter/source/Typewriter/DDgilau.jpg
+
+newmtl Royal_typewriter_Measure
+Ns 1000.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.091577 0.018315 0.018315
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Royal_typewriter_Metal_black
+Ns 1000.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.061069 0.061069 0.061069
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Royal_typewriter_Paper
+Ns 1000.000000
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd E:/OneDrive/_Aus/_ANU Study/26S1/CG/Research_Project2/model/typewriter/source/Typewriter/Royal typewriter paper.jpg
+
+newmtl Royal_typewriter_Plastic
+Ns 1000.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.286515 0.261106 0.153904
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Royal_typewriter_Rubber
+Ns 1000.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.091294 0.091949 0.080894
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Royal_typewriter_Tape
+Ns 1000.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.161600 0.144322 0.224534
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl Wall
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/T_Wall_01_A.tga.png
+map_Ns C:/T_Wall_01_R.tga.png
+map_Bump -bm 1.000000 C:/T_Wall_01_N.tga.png
