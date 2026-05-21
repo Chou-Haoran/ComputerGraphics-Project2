@@ -4,55 +4,86 @@ materialMap {
 }
 
 mtl "17_-_Default" {
-    type = MICROFACET
-    roughness = 0.32
-    Ks = 0.10
+    type = ENAMEL
+    color = 0.82 0.86 0.90
+    roughness = 0.30
+    Kd = 0.52
+    Ks = 0.88
+    diffuseTex = "textures/typewriter_body_enamel.ppm"
 }
 
 mtl "Material_#51" {
     type = DIFFUSE
+    color = 0.66 0.61 0.52
+    Kd = 1.0
     Ks = 0.0
 }
 
 mtl "Metal_Chrome" {
     type = METAL
-    color = 0.85 0.85 0.84
-    roughness = 0.10
-    Ks = 0.95
+    color = 0.88 0.88 0.84
+    roughness = 0.09
+    Ks = 0.98
+}
+
+mtl "Royal_typewriter_Base_color" {
+    type = ENAMEL
+    color = 0.11 0.115 0.12
+    roughness = 0.28
+    Kd = 0.50
+    Ks = 0.86
+}
+
+mtl "Royal_typewriter_Base_color.001" {
+    type = ENAMEL
+    color = 0.11 0.115 0.12
+    roughness = 0.28
+    Kd = 0.50
+    Ks = 0.86
 }
 
 mtl "Royal_typewriter_Buttons" {
     type = MICROFACET
-    roughness = 0.36
-    Ks = 0.10
+    color = 1.00 0.88 0.58
+    roughness = 0.28
+    Kd = 0.70
+    Ks = 0.30
 }
 
 mtl "Royal_typewriter_Label" {
     type = DIFFUSE
+    color = 0.95 0.84 0.58
     Ks = 0.0
 }
 
 mtl "Royal_typewriter_Measure" {
     type = MICROFACET
-    roughness = 0.30
-    Ks = 0.10
+    color = 0.86 0.65 0.34
+    roughness = 0.24
+    Kd = 0.55
+    Ks = 0.42
 }
 
 mtl "Royal_typewriter_Metal_black" {
-    type = MICROFACET
-    roughness = 0.28
-    Ks = 0.14
+    type = ENAMEL
+    color = 0.030 0.032 0.034
+    roughness = 0.26
+    Kd = 0.48
+    Ks = 0.82
 }
 
 mtl "Royal_typewriter_Paper" {
     type = DIFFUSE
+    color = 0.96 0.92 0.82
     Ks = 0.0
 }
 
 mtl "Royal_typewriter_Plastic" {
     type = MICROFACET
-    roughness = 0.42
-    Ks = 0.10
+    color = 0.54 0.44 0.28
+    roughness = 0.36
+    Kd = 0.70
+    Ks = 0.22
 }
 
 mtl "Royal_typewriter_Rubber" {
@@ -63,6 +94,8 @@ mtl "Royal_typewriter_Rubber" {
 
 mtl "Royal_typewriter_Tape" {
     type = MICROFACET
-    roughness = 0.45
-    Ks = 0.08
+    color = 0.18 0.015 0.018
+    roughness = 0.50
+    Kd = 0.70
+    Ks = 0.12
 }

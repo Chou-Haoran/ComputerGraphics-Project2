@@ -82,8 +82,8 @@ void Renderer::Render(const Scene& scene, const Camera& camera)
 #endif
 
 #pragma omp parallel for schedule(dynamic, 1) num_threads(threadCount)
-    for (uint32_t j = 0; j < (uint32_t)scene.height; ++j) {
-        for (uint32_t i = 0; i < (uint32_t)scene.width; ++i) {
+    for (int j = 0; j < scene.height; ++j) {
+        for (int i = 0; i < scene.width; ++i) {
             int pixelIdx = i + j * scene.width;
             Vector3f color(0.0f);
             float luminanceMean = 0.0f;

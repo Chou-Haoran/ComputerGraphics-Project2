@@ -6,10 +6,17 @@
 render {
     width   = 960
     height  = 720
-    spp     = 64
+    spp     = 128
     depth   = 8
     shadows = true
     bg      = 0.055 0.055 0.058
+    adaptiveSampling = false
+    denoise = true
+    denoiseRadius = 1
+    denoiseSigmaSpatial = 1.0
+    denoiseSigmaColor = 0.08
+    denoiseSigmaNormal = 0.08
+    denoiseSigmaAlbedo = 0.10
 }
 
 camera {
@@ -68,12 +75,12 @@ light {
 
 light {
     type        = SPOT
-    pos         = 0.115 0.115 0.075
-    dir         = -0.720 -0.620 -0.310
-    emission    = 0.98 0.96 1.00
-    intensity   = 0.0009
-    innerAngle  = 14.0
-    outerAngle  = 26.0
+    pos         = 0.135 0.112 0.060
+    dir         = -0.740 -0.560 -0.370
+    emission    = 0.86 0.91 1.00
+    intensity   = 0.0060
+    innerAngle  = 10.0
+    outerAngle  = 21.0
     range       = 0.26
     enabled   = true
 }
