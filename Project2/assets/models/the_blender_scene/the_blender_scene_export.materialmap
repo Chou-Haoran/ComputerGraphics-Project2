@@ -1,0 +1,207 @@
+# 基于 scene_export.json 的 Blender 材质重建版。
+# 说明：
+# - 保留 Blender 导出的贴图连接和基础参数。
+# - 对当前渲染器不稳定的部分做兼容修正：保留原资产的 gloss 贴图语义，
+#   同时继续使用更稳的材质类型分配，避免大面积材质发黑或发灰。
+
+materialMap {
+    defaultType = MICROFACET
+    defaultRoughnessMin = 0.16
+}
+
+mtl "Ceiling" {
+    type = MICROFACET
+    color = 1.00 1.00 1.00
+    roughness = 0.92
+    Ks = 0.02
+    diffuseTex = "textures/T_Celing_01_A.tga.png"
+    roughnessTex = "textures/T_Celing_01_R.tga.png"
+    roughnessTexIsGloss = true
+    normalTex = "textures/T_Celing_01_N.tga.png"
+    bumpTex = "textures/T_Celing_01_N.tga.png"
+    bumpScale = 0.0
+}
+
+mtl "Curtain" {
+    type = MICROFACET
+    color = 1.00 1.00 1.00
+    roughness = 0.88
+    Ks = 0.03
+    diffuseTex = "textures/T_Curtain_01_A.tga.png"
+    roughnessTex = "textures/T_Curtain_01_R.jpg"
+    roughnessTexIsGloss = true
+    normalTex = "textures/T_Curtain_01_N.tga.png"
+    bumpTex = "textures/T_Curtain_01_N.tga.png"
+    bumpScale = 0.0
+}
+
+mtl "Floor" {
+    type = MICROFACET
+    color = 1.00 1.00 1.00
+    roughness = 0.48
+    Ks = 0.10
+    diffuseTex = "textures/T_Floor_01_A.tga.png"
+    roughnessTex = "textures/T_Floor_01_R.tga.png"
+    roughnessTexIsGloss = true
+    normalTex = "textures/T_Floor_01_N.tga.png"
+    bumpTex = "textures/T_Floor_01_N.tga.png"
+    bumpScale = 0.0
+}
+
+mtl "Gass" {
+    type = GLASS
+    color = 0.96 0.97 1.00
+    ior = 1.45
+    roughness = 0.06
+    Ks = 0.02
+    diffuseTex = "textures/T_Glass_01_A.tga.png"
+    roughnessTex = "textures/T_Glass_01_R.tga.png"
+    roughnessTexIsGloss = true
+    normalTex = "textures/T_Glass_01_N.tga.png"
+    bumpTex = "textures/T_Glass_01_N.tga.png"
+    bumpScale = 0.0
+}
+
+mtl "Lampshade" {
+    type = MICROFACET
+    color = 1.00 1.00 1.00
+    roughness = 0.82
+    Ks = 0.05
+    diffuseTex = "textures/T_Lampshade_01_A.tga.png"
+    roughnessTex = "textures/T_Lampshade_01_R.tga.png"
+    roughnessTexIsGloss = true
+    normalTex = "textures/T_Lampshade_01_N.tga.png"
+    bumpTex = "textures/T_Lampshade_01_N.tga.png"
+    bumpScale = 0.0
+}
+
+mtl "Material_#51" {
+    type = DIFFUSE
+    color = 0.588 0.588 0.588
+    roughness = 0.858579
+    Ks = 0.00
+}
+
+mtl "Metal_Chrome" {
+    type = METAL
+    color = 0.439216 0.439216 0.439216
+    roughness = 0.10
+    Ks = 0.95
+}
+
+mtl "Prop01" {
+    type = MICROFACET
+    color = 1.00 1.00 1.00
+    metallic = 1.0
+    roughness = 0.34
+    Ks = 0.18
+    diffuseTex = "textures/T_Props_01_A.tga.png"
+    metallicTex = "textures/T_Props_01_M.tga.png"
+    roughnessTex = "textures/T_Props_01_R.tga.png"
+    roughnessTexIsGloss = true
+    normalTex = "textures/T_Props_01_N.tga.png"
+    bumpTex = "textures/T_Props_01_N.tga.png"
+    bumpScale = 0.0
+}
+
+mtl "Prop02" {
+    type = MICROFACET
+    color = 1.00 1.00 1.00
+    metallic = 1.0
+    roughness = 0.30
+    Ks = 0.20
+    diffuseTex = "textures/T_Props_02_A.tga.png"
+    metallicTex = "textures/T_Props_02_M.tga.png"
+    roughnessTex = "textures/T_Props_02_R.tga.png"
+    roughnessTexIsGloss = true
+    normalTex = "textures/T_Props_02_N.tga.png"
+    bumpTex = "textures/T_Props_02_N.tga.png"
+    bumpScale = 0.0
+}
+
+mtl "Prop03" {
+    type = MICROFACET
+    color = 1.00 1.00 1.00
+    metallic = 1.0
+    roughness = 0.26
+    Ks = 0.22
+    diffuseTex = "textures/T_Props_03_A.tga.png"
+    metallicTex = "textures/T_Props_03_M.tga.png"
+    roughnessTex = "textures/T_Props_03_R.tga.png"
+    roughnessTexIsGloss = true
+    normalTex = "textures/T_Props_03_N.tga.png"
+    bumpTex = "textures/T_Props_03_N.tga.png"
+    bumpScale = 0.0
+}
+
+mtl "Royal_typewriter_Buttons" {
+    type = MICROFACET
+    color = 0.123173 0.111422 0.088164
+    roughness = 0.34
+    Ks = 0.10
+    diffuseTex = "../desktop_scene/typewriter/textures/Royal typewriter buttons.jpg"
+}
+
+mtl "Royal_typewriter_Label" {
+    type = DIFFUSE
+    color = 1.00 1.00 1.00
+    roughness = 0.16
+    Ks = 0.00
+    diffuseTex = "../desktop_scene/typewriter/textures/DDgilau.jpg"
+}
+
+mtl "Royal_typewriter_Measure" {
+    type = MICROFACET
+    color = 0.091577 0.018315 0.018315
+    roughness = 0.24
+    Ks = 0.12
+}
+
+mtl "Royal_typewriter_Metal_black" {
+    type = MICROFACET
+    color = 0.061069 0.061069 0.061069
+    roughness = 0.20
+    Ks = 0.18
+}
+
+mtl "Royal_typewriter_Paper" {
+    type = DIFFUSE
+    color = 0.4096 0.4096 0.4096
+    roughness = 0.16
+    Ks = 0.00
+    diffuseTex = "../desktop_scene/typewriter/textures/Royal typewriter paper.jpg"
+}
+
+mtl "Royal_typewriter_Plastic" {
+    type = MICROFACET
+    color = 0.286515 0.261106 0.153904
+    roughness = 0.42
+    Ks = 0.10
+}
+
+mtl "Royal_typewriter_Rubber" {
+    type = MICROFACET
+    color = 0.091294 0.091949 0.080894
+    roughness = 0.82
+    Ks = 0.04
+}
+
+mtl "Royal_typewriter_Tape" {
+    type = MICROFACET
+    color = 0.1616 0.144322 0.224534
+    roughness = 0.46
+    Ks = 0.08
+}
+
+mtl "Wall" {
+    type = MICROFACET
+    color = 1.00 1.00 1.00
+    roughness = 0.70
+    Ks = 0.05
+    diffuseTex = "textures/T_Wall_01_A.tga.png"
+    roughnessTex = "textures/T_Wall_01_R.tga.png"
+    roughnessTexIsGloss = true
+    normalTex = "textures/T_Wall_01_N.tga.png"
+    bumpTex = "textures/T_Wall_01_N.tga.png"
+    bumpScale = 0.0
+}

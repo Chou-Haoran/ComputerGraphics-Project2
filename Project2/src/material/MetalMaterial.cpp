@@ -14,19 +14,24 @@ public:
         return kType;
     }
 
-    Vector3f sample(const Vector3f& wi, const Vector3f& N, float rough) const override
+    Vector3f sample(const Vector3f& wi, const Vector3f& N,
+                    const Vector3f&, float rough,
+                    float) const override
     {
         return sampleGGXReflection(wi, N, rough);
     }
 
-    float pdf(const Vector3f& wi, const Vector3f& wo, const Vector3f& N, float rough) const override
+    float pdf(const Vector3f& wi, const Vector3f& wo, const Vector3f& N,
+              const Vector3f&, float rough,
+              float) const override
     {
         if (dotProduct(wo, N) <= 0.0f) return 0.0f;
         return pdfGGX(wi, wo, N, rough);
     }
 
     Vector3f eval(const Vector3f& wi, const Vector3f& wo, const Vector3f& N,
-                  const Vector3f& albedo, float rough) const override
+                  const Vector3f& albedo, float rough,
+                  float) const override
     {
         float NdotV = std::max(0.0f, dotProduct(N, wi));
         float NdotL = std::max(0.0f, dotProduct(N, wo));

@@ -15,7 +15,9 @@ public:
         return kType;
     }
 
-    Vector3f sample(const Vector3f&, const Vector3f& N, float) const override
+    Vector3f sample(const Vector3f&, const Vector3f& N,
+                    const Vector3f&, float,
+                    float) const override
     {
         float x1 = get_random_float();
         float x2 = get_random_float();
@@ -27,13 +29,16 @@ public:
         return toWorld(Vector3f(x, y, z), N);
     }
 
-    float pdf(const Vector3f&, const Vector3f& wo, const Vector3f& N, float) const override
+    float pdf(const Vector3f&, const Vector3f& wo, const Vector3f& N,
+              const Vector3f&, float,
+              float) const override
     {
         return std::max(0.0f, dotProduct(wo, N)) / static_cast<float>(M_PI);
     }
 
     Vector3f eval(const Vector3f& wi, const Vector3f& wo, const Vector3f& N,
-                  const Vector3f& albedo, float) const override
+                  const Vector3f& albedo, float,
+                  float) const override
     {
         float NdotV = std::max(0.0f, dotProduct(N, wi));
         float NdotL = std::max(0.0f, dotProduct(N, wo));

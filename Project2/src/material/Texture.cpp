@@ -260,8 +260,11 @@ Vector3f Texture::sampleAnisotropic(float u, float v,
 
     const float rhoU = std::fabs(footprintU) * static_cast<float>(width());
     const float rhoV = std::fabs(footprintV) * static_cast<float>(height());
-    const float majorRho = std::max(rhoU, rhoV);
+    const bool majorIsU = rhoU >= rhoV;
+    const float majorRhoRaw = std::max(rhoU, rhoV);
     const float minorRho = std::max(std::min(rhoU, rhoV), 1.0f);
+    const float maxSupportedAnisotropy = static_cast<float>(std::max(1, maxSamples));
+    const float majorRho = std::min(majorRhoRaw, minorRho * maxSupportedAnisotropy);
     const float anisotropy = majorRho / minorRho;
 
     if (majorRho <= 1.0f || anisotropy <= 1.5f || maxSamples <= 1) {
@@ -269,15 +272,20 @@ Vector3f Texture::sampleAnisotropic(float u, float v,
         return sample(u, v, lod);
     }
 
-    const bool majorIsU = rhoU >= rhoV;
     const float minorLod = std::log2(minorRho);
     const int taps = std::clamp(static_cast<int>(std::ceil(anisotropy)), 2, maxSamples);
+    const float effectiveFootprintU = majorIsU
+        ? std::copysign(majorRho / std::max(1, width()), footprintU)
+        : footprintU;
+    const float effectiveFootprintV = majorIsU
+        ? footprintV
+        : std::copysign(majorRho / std::max(1, height()), footprintV);
 
     Vector3f accum(0.0f);
     for (int i = 0; i < taps; ++i) {
         const float offset = ((static_cast<float>(i) + 0.5f) / static_cast<float>(taps)) - 0.5f;
-        const float sampleU = majorIsU ? u + offset * footprintU : u;
-        const float sampleV = majorIsU ? v : v + offset * footprintV;
+        const float sampleU = majorIsU ? u + offset * effectiveFootprintU : u;
+        const float sampleV = majorIsU ? v : v + offset * effectiveFootprintV;
         accum += sample(sampleU, sampleV, minorLod);
     }
     return accum / static_cast<float>(taps);

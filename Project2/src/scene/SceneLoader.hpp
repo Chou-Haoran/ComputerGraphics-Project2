@@ -26,9 +26,11 @@ struct MeshSpec {
     Vector3f     scale    = {1, 1, 1};    // TODO: MeshTriangle ignores this
     std::optional<std::string>  materialMap;  // per-MTL-name overrides
     std::optional<float>        ior;
+    std::optional<float>        metallic;
     std::optional<float>        roughness;
     std::optional<Vector3f>     emission; // non-zero ⇒ self-illuminating mesh
     std::optional<std::string>  diffuseTex;   // optional path relative to scene dir
+    std::optional<std::string>  metallicTex;
     std::optional<std::string>  normalTex;
     std::optional<std::string>  bumpTex;
     std::optional<std::string>  roughnessTex;

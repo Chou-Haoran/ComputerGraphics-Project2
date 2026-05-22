@@ -38,18 +38,23 @@ public:
         return interaction;
     }
 
-    Vector3f sample(const Vector3f&, const Vector3f&, float) const override
+    Vector3f sample(const Vector3f&, const Vector3f&,
+                    const Vector3f&, float,
+                    float) const override
     {
         return Vector3f(0.0f);
     }
 
-    float pdf(const Vector3f&, const Vector3f&, const Vector3f&, float) const override
+    float pdf(const Vector3f&, const Vector3f&, const Vector3f&,
+              const Vector3f&, float,
+              float) const override
     {
         return 0.0f;
     }
 
     Vector3f eval(const Vector3f&, const Vector3f&, const Vector3f&,
-                  const Vector3f&, float) const override
+                  const Vector3f&, float,
+                  float) const override
     {
         return Vector3f(0.0f);
     }

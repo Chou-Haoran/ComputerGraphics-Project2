@@ -10,15 +10,18 @@ Material::Material(const MaterialConfig& config)
     : m_color(config.color),
       m_emission(config.emission),
       ior(config.ior),
+      metallic(config.metallic),
       Kd(config.Kd),
       Ks(config.Ks),
       specularExponent(config.specularExponent),
       textured(config.textured),
       diffuseTexture(config.diffuseTexture),
+      metallicTexture(config.metallicTexture),
       normalTexture(config.normalTexture),
       bumpTexture(config.bumpTexture),
       roughnessTexture(config.roughnessTexture),
       diffuseTexPath(config.diffuseTexPath),
+      metallicTexPath(config.metallicTexPath),
       normalTexPath(config.normalTexPath),
       bumpTexPath(config.bumpTexPath),
       roughnessTexPath(config.roughnessTexPath),
@@ -72,6 +75,16 @@ Vector3f Material::getColorAtAnisotropic(double u, double v,
                         m_color.z * texel.z);
     }
     return m_color;
+}
+
+float Material::getMetallicAt(double u, double v, float lod) const
+{
+    float out = metallic;
+    if (metallicTexture && metallicTexture->valid()) {
+        float tex = metallicTexture->sampleScalar(static_cast<float>(u), static_cast<float>(v), lod);
+        out = metallic > EPSILON ? out * tex : tex;
+    }
+    return clamp(0.0f, 1.0f, out);
 }
 
 float Material::getRoughnessAt(double u, double v, float lod) const
@@ -191,6 +204,12 @@ Vector3f Material::fresnelSchlick(float cosTheta, const Vector3f& F0) const
     return F0 + (Vector3f(1.0f) - F0) * factor;
 }
 
+Vector3f Material::blendF0(const Vector3f& albedo, float metallicValue) const
+{
+    const float t = clamp(0.0f, 1.0f, metallicValue);
+    return Vector3f(0.04f) * (1.0f - t) + albedo * t;
+}
+
 float Material::luminance(const Vector3f& c) const
 {
     return 0.2126f * c.x + 0.7152f * c.y + 0.0722f * c.z;
@@ -235,11 +254,12 @@ float Material::pdfCosineHemisphere(const Vector3f& wo, const Vector3f& N) const
 }
 
 float Material::specularSampleWeight(const Vector3f& wi, const Vector3f& N,
-                                     float rough, const Vector3f& F0) const
+                                     float rough, const Vector3f& F0,
+                                     const Vector3f& diffuseColor) const
 {
     float cosTheta = std::max(0.0f, dotProduct(wi, N));
     float fresnelLum = luminance(fresnelSchlick(cosTheta, F0));
-    float diffuseWeight = std::max(0.0f, Kd) * std::max(0.05f, luminance(m_color));
+    float diffuseWeight = std::max(0.0f, Kd) * std::max(0.02f, luminance(diffuseColor));
     float glossBoost = 0.35f + 0.65f * (1.0f - clamp(0.0f, 1.0f, rough));
     float specularWeight = std::max(0.0f, Ks) * std::max(0.08f, fresnelLum) * glossBoost * 4.0f;
     float sum = diffuseWeight + specularWeight;

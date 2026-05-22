@@ -15,25 +15,34 @@ public:
         return kType;
     }
 
-    Vector3f sample(const Vector3f& wi, const Vector3f& N, float rough) const override
+    Vector3f sample(const Vector3f& wi, const Vector3f& N,
+                    const Vector3f& albedo, float rough,
+                    float metallic) const override
     {
-        float specularWeight = specularSampleWeight(wi, N, rough, Vector3f(0.04f));
+        Vector3f F0 = blendF0(albedo, metallic);
+        Vector3f diffuseColor = albedo * (1.0f - clamp(0.0f, 1.0f, metallic));
+        float specularWeight = specularSampleWeight(wi, N, rough, F0, diffuseColor);
         if (get_random_float() < specularWeight) {
             return sampleGGXReflection(wi, N, rough);
         }
         return sampleCosineHemisphere(N);
     }
 
-    float pdf(const Vector3f& wi, const Vector3f& wo, const Vector3f& N, float rough) const override
+    float pdf(const Vector3f& wi, const Vector3f& wo, const Vector3f& N,
+              const Vector3f& albedo, float rough,
+              float metallic) const override
     {
         if (dotProduct(wo, N) <= 0.0f) return 0.0f;
-        float specularWeight = specularSampleWeight(wi, N, rough, Vector3f(0.04f));
+        Vector3f F0 = blendF0(albedo, metallic);
+        Vector3f diffuseColor = albedo * (1.0f - clamp(0.0f, 1.0f, metallic));
+        float specularWeight = specularSampleWeight(wi, N, rough, F0, diffuseColor);
         float diffusePdf = pdfCosineHemisphere(wo, N);
         return (1.0f - specularWeight) * diffusePdf + specularWeight * pdfGGX(wi, wo, N, rough);
     }
 
     Vector3f eval(const Vector3f& wi, const Vector3f& wo, const Vector3f& N,
-                  const Vector3f& albedo, float rough) const override
+                  const Vector3f& albedo, float rough,
+                  float metallic) const override
     {
         float NdotV = std::max(0.0f, dotProduct(N, wi));
         float NdotL = std::max(0.0f, dotProduct(N, wo));
@@ -45,9 +54,11 @@ public:
         float alpha = std::max(0.04f, rough * rough);
         float D = distributionGGX(N, H, alpha);
         float G = geometrySmith(N, wi, wo, alpha);
-        Vector3f F = fresnelSchlick(std::max(0.0f, dotProduct(H, wo)), Vector3f(0.04f));
+        float metallicClamped = clamp(0.0f, 1.0f, metallic);
+        Vector3f F0 = blendF0(albedo, metallicClamped);
+        Vector3f F = fresnelSchlick(std::max(0.0f, dotProduct(H, wo)), F0);
         Vector3f spec = F * (Ks * D * G / std::max(4.0f * NdotV * NdotL, 1e-7f));
-        Vector3f kd = Vector3f(1.0f - F.x, 1.0f - F.y, 1.0f - F.z);
+        Vector3f kd = Vector3f(1.0f - F.x, 1.0f - F.y, 1.0f - F.z) * (1.0f - metallicClamped);
         Vector3f diffuse = kd * albedo * (Kd / static_cast<float>(M_PI));
         return diffuse + spec;
     }

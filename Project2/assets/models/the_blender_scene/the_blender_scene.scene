@@ -33,7 +33,7 @@ camera {
 }
 
 mesh "blender.obj" {
-    materialMap = "the_blender_scene.materialmap"
+    materialMap = "the_blender_scene_export.materialmap"
     offset      = 0.0 0.0 0.0
     rotation    = 0.0 0.0 0.0
     scale       = 1.0 1.0 1.0

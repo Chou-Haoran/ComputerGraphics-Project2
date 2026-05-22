@@ -41,14 +41,17 @@ TextureFootprint estimateTextureFootprint(const Scene& scene,
     const float fovY = deg2rad(scene.camera ? scene.camera->fov()
                                             : static_cast<float>(scene.fov));
     const float hitDistance = std::max(static_cast<float>(inter.tnear), 1e-4f);
-    const float pixelWorld = (2.0f * hitDistance * std::tan(0.5f * fovY)) /
+    const float pixelWorld = (hitDistance * std::tan(0.5f * fovY)) /
                              static_cast<float>(scene.height);
     const float ndotv = std::max(std::fabs(dotProduct(normalize(inter.normal),
                                                       normalize(-ray.direction))),
-                                 0.15f);
-    const float surfaceFootprint = pixelWorld / ndotv;
+                                 0.35f);
+    const float viewStretch = 1.0f / std::sqrt(ndotv);
+    const float surfaceFootprint = pixelWorld * viewStretch;
     fp.uvSpanU = surfaceFootprint / std::max(inter.dpdu.norm(), 1e-6f);
     fp.uvSpanV = surfaceFootprint / std::max(inter.dpdv.norm(), 1e-6f);
+    fp.uvSpanU = clamp(0.0f, 0.25f, fp.uvSpanU);
+    fp.uvSpanV = clamp(0.0f, 0.25f, fp.uvSpanV);
     fp.rhoU = fp.uvSpanU * static_cast<float>(texture->width());
     fp.rhoV = fp.uvSpanV * static_cast<float>(texture->height());
     const float rho = std::max(fp.rhoU, fp.rhoV);
@@ -155,6 +158,8 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
     Vector3f viewDir    = normalize(-ray.direction);
     const TextureFootprint diffuseFp =
         estimateTextureFootprint(*this, ray, inter, inter.material->diffuseTexture);
+    const TextureFootprint metallicFp =
+        estimateTextureFootprint(*this, ray, inter, inter.material->metallicTexture);
     const TextureFootprint normalFp =
         estimateTextureFootprint(*this, ray, inter, inter.material->normalTexture);
     const TextureFootprint roughnessFp =
@@ -162,6 +167,7 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
     Vector3f surfaceCol = inter.material->getColorAtAnisotropic(st.x, st.y,
                                                                 diffuseFp.uvSpanU,
                                                                 diffuseFp.uvSpanV);
+    float surfaceMetallic = inter.material->getMetallicAt(st.x, st.y, metallicFp.lod);
     if (inter.material->normalTexture && inter.material->normalTexture->valid()) {
         N = inter.material->applyNormalMap(st.x, st.y, N, inter.tangent, inter.bitangent,
                                            normalFp.lod);
@@ -212,11 +218,14 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
 
                 if (visible) {
                     Vector3f brdf = inter.material->eval(viewDir, sample.direction, N,
-                                                         surfaceCol, surfaceRoughness);
+                                                         surfaceCol, surfaceRoughness,
+                                                         surfaceMetallic);
                     float lightPdf = sample.pdf * lightPickPdf;
                     float weight = 1.0f;
                     if (!sample.delta) {
-                        float bsdfPdf = inter.material->pdf(viewDir, sample.direction, N, surfaceRoughness);
+                        float bsdfPdf = inter.material->pdf(viewDir, sample.direction, N,
+                                                            surfaceCol, surfaceRoughness,
+                                                            surfaceMetallic);
                         weight = powerHeuristic(lightPdf, bsdfPdf);
                     }
 
@@ -243,8 +252,11 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
 
                 if (visible) {
                     Vector3f brdf = inter.material->eval(viewDir, envDir, N,
-                                                         surfaceCol, surfaceRoughness);
-                    float bsdfPdf = inter.material->pdf(viewDir, envDir, N, surfaceRoughness);
+                                                         surfaceCol, surfaceRoughness,
+                                                         surfaceMetallic);
+                    float bsdfPdf = inter.material->pdf(viewDir, envDir, N,
+                                                        surfaceCol, surfaceRoughness,
+                                                        surfaceMetallic);
                     float weight = powerHeuristic(envPdf, bsdfPdf);
                     directLight += envRadiance * brdf * envCosTheta * weight /
                                    std::max(envPdf, 1e-8f);
@@ -254,8 +266,12 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
     }
 
     if (get_random_float() < RussianRoulette) {
-        Vector3f sampleDir = normalize(inter.material->sample(viewDir, N, surfaceRoughness));
-        float    pdf       = inter.material->pdf(viewDir, sampleDir, N, surfaceRoughness);
+        Vector3f sampleDir = normalize(inter.material->sample(viewDir, N, surfaceCol,
+                                                              surfaceRoughness,
+                                                              surfaceMetallic));
+        float    pdf       = inter.material->pdf(viewDir, sampleDir, N, surfaceCol,
+                                                 surfaceRoughness,
+                                                 surfaceMetallic);
         float    cosSample = std::max(0.0f, dotProduct(N, sampleDir));
         if (pdf > 1e-8f && cosSample > 0.0f) {
             Ray nextRay(offsetRayOrigin(hitPoint, N, sampleDir), sampleDir);
@@ -267,18 +283,21 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
                     float envPdf = envmap->pdf(sampleDir);
                     float weight = powerHeuristic(pdf, envPdf);
                     Vector3f brdf = inter.material->eval(viewDir, sampleDir, N,
-                                                         surfaceCol, surfaceRoughness);
+                                                         surfaceCol, surfaceRoughness,
+                                                         surfaceMetallic);
                     indirectLight = missRadiance * brdf * cosSample * weight /
                                     (pdf * RussianRoulette);
                 } else {
                     Vector3f brdf = inter.material->eval(viewDir, sampleDir, N,
-                                                         surfaceCol, surfaceRoughness);
+                                                         surfaceCol, surfaceRoughness,
+                                                         surfaceMetallic);
                     indirectLight = castRay(nextRay, depth + 1) *
                                     brdf * cosSample / (pdf * RussianRoulette);
                 }
             } else if (!nextInter.material->hasEmission()) {
                 Vector3f brdf = inter.material->eval(viewDir, sampleDir, N,
-                                                     surfaceCol, surfaceRoughness);
+                                                     surfaceCol, surfaceRoughness,
+                                                     surfaceMetallic);
                 indirectLight = castRay(nextRay, depth + 1) *
                                 brdf * cosSample / (pdf * RussianRoulette);
             }

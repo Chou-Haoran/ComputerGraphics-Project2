@@ -68,11 +68,13 @@ struct MaterialOverrideSpec {
     std::optional<std::string>  type;
     std::optional<Vector3f>     color;
     std::optional<float>        ior;
+    std::optional<float>        metallic;
     std::optional<float>        roughness;
     std::optional<float>        Kd;
     std::optional<float>        Ks;
     std::optional<Vector3f>     emission;
     std::optional<std::string>  diffuseTex;
+    std::optional<std::string>  metallicTex;
     std::optional<std::string>  normalTex;
     std::optional<std::string>  bumpTex;
     std::optional<std::string>  roughnessTex;
@@ -281,9 +283,11 @@ private:
             else if (f == "rotation")     m.rotation     = parseV3();
             else if (f == "scale")        m.scale        = parseV3();
             else if (f == "ior")          m.ior          = parseNum();
+            else if (f == "metallic")     m.metallic     = parseNum();
             else if (f == "roughness")    m.roughness    = parseNum();
             else if (f == "emission")     m.emission     = parseV3();
             else if (f == "diffuseTex")   m.diffuseTex   = parseStr();
+            else if (f == "metallicTex")  m.metallicTex  = parseStr();
             else if (f == "normalTex")    m.normalTex    = parseStr();
             else if (f == "bumpTex")      m.bumpTex      = parseStr();
             else if (f == "roughnessTex") m.roughnessTex = parseStr();
@@ -406,11 +410,13 @@ private:
             if      (f == "type")                spec.type = parseMaterialType();
             else if (f == "color")               spec.color = parseV3();
             else if (f == "ior")                 spec.ior = parseNum();
+            else if (f == "metallic")            spec.metallic = parseNum();
             else if (f == "roughness")           spec.roughness = parseNum();
             else if (f == "Kd")                  spec.Kd = parseNum();
             else if (f == "Ks")                  spec.Ks = parseNum();
             else if (f == "emission")            spec.emission = parseV3();
             else if (f == "diffuseTex")          spec.diffuseTex = parseStr();
+            else if (f == "metallicTex")         spec.metallicTex = parseStr();
             else if (f == "normalTex")           spec.normalTex = parseStr();
             else if (f == "bumpTex")             spec.bumpTex = parseStr();
             else if (f == "roughnessTex")        spec.roughnessTex = parseStr();
@@ -694,6 +700,8 @@ LoadedScene SceneLoader::load(const std::string& sceneDir,
             config.color = color;
             config.ior = meshSpec.ior.value_or(
                 override && override->ior ? *override->ior : inferIor(srcMaterial));
+            config.metallic = meshSpec.metallic.value_or(
+                override && override->metallic ? *override->metallic : 0.0f);
             config.roughness = meshSpec.roughness.value_or(
                 override && override->roughness ? *override->roughness : inferRoughness(srcMaterial));
             if (!meshSpec.roughness && !(override && override->roughness) &&
@@ -725,6 +733,15 @@ LoadedScene SceneLoader::load(const std::string& sceneDir,
             }
             if (config.Kd < EPSILON && !config.diffuseTexPath.empty()) {
                 config.Kd = 1.0f;
+            }
+
+            if (meshSpec.metallicTex) {
+                config.metallicTexPath = resolveRelative(sceneRoot, *meshSpec.metallicTex).string();
+            } else if (override && override->metallicTex) {
+                config.metallicTexPath = resolveRelative(materialMap.sourceDir, *override->metallicTex).string();
+            }
+            if (!config.metallicTexPath.empty() && config.metallic <= EPSILON) {
+                config.metallic = 1.0f;
             }
 
             if (meshSpec.normalTex) {
@@ -767,6 +784,15 @@ LoadedScene SceneLoader::load(const std::string& sceneDir,
                 } else {
                     std::cerr << "SceneLoader: WARN failed to load diffuse texture \""
                               << config.diffuseTexPath << "\" for " << meshSpec.objPath << "\n";
+                }
+            }
+
+            if (!config.metallicTexPath.empty()) {
+                if (Texture* tex = loadTextureCached(config.metallicTexPath)) {
+                    config.metallicTexture = tex;
+                } else {
+                    std::cerr << "SceneLoader: WARN failed to load metallic texture \""
+                              << config.metallicTexPath << "\" for " << meshSpec.objPath << "\n";
                 }
             }
 
