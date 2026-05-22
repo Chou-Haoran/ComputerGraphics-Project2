@@ -11,7 +11,9 @@ namespace {
 
 unsigned char encodeDisplay(float x)
 {
-    const float mapped = x / (1.0f + std::max(x, 0.0f));
+    const float exposed = std::max(x, 0.0f) * 0.85f;
+    const float mapped = (exposed * (2.51f * exposed + 0.03f)) /
+                         (exposed * (2.43f * exposed + 0.59f) + 0.14f);
     const float gammaEncoded = std::pow(clamp(0.0f, 1.0f, mapped), 1.0f / 2.2f);
     return static_cast<unsigned char>(255.0f * gammaEncoded);
 }
