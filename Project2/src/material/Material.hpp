@@ -61,12 +61,16 @@ public:
                           const Vector3f& albedo, float rough) const = 0;
 
     Vector3f getColor() const;
-    Vector3f getColorAt(double u, double v) const;
-    float    getRoughnessAt(double u, double v) const;
+    Vector3f getColorAt(double u, double v, float lod = 0.0f) const;
+    Vector3f getColorAtAnisotropic(double u, double v,
+                                   float footprintU, float footprintV,
+                                   int maxSamples = 8) const;
+    float    getRoughnessAt(double u, double v, float lod = 0.0f) const;
     Vector3f applyNormalMap(double u, double v,
                             const Vector3f& N,
                             const Vector3f& T,
-                            const Vector3f& B) const;
+                            const Vector3f& B,
+                            float lod = 0.0f) const;
     Vector3f getEmission() const;
     bool hasEmission() const;
 

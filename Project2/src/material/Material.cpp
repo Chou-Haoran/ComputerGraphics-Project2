@@ -46,10 +46,10 @@ MaterialInteraction Material::resolveInteraction(const Vector3f&, const Vector3f
     return interaction;
 }
 
-Vector3f Material::getColorAt(double u, double v) const
+Vector3f Material::getColorAt(double u, double v, float lod) const
 {
     if (textured && diffuseTexture && diffuseTexture->valid()) {
-        Vector3f texel = diffuseTexture->sample(static_cast<float>(u), static_cast<float>(v));
+        Vector3f texel = diffuseTexture->sample(static_cast<float>(u), static_cast<float>(v), lod);
         return Vector3f(m_color.x * texel.x,
                         m_color.y * texel.y,
                         m_color.z * texel.z);
@@ -57,11 +57,28 @@ Vector3f Material::getColorAt(double u, double v) const
     return m_color;
 }
 
-float Material::getRoughnessAt(double u, double v) const
+Vector3f Material::getColorAtAnisotropic(double u, double v,
+                                         float footprintU, float footprintV,
+                                         int maxSamples) const
+{
+    if (textured && diffuseTexture && diffuseTexture->valid()) {
+        Vector3f texel = diffuseTexture->sampleAnisotropic(static_cast<float>(u),
+                                                           static_cast<float>(v),
+                                                           footprintU,
+                                                           footprintV,
+                                                           maxSamples);
+        return Vector3f(m_color.x * texel.x,
+                        m_color.y * texel.y,
+                        m_color.z * texel.z);
+    }
+    return m_color;
+}
+
+float Material::getRoughnessAt(double u, double v, float lod) const
 {
     float out = roughness;
     if (roughnessTexture && roughnessTexture->valid()) {
-        float tex = roughnessTexture->sampleScalar(static_cast<float>(u), static_cast<float>(v));
+        float tex = roughnessTexture->sampleScalar(static_cast<float>(u), static_cast<float>(v), lod);
         if (roughnessTexIsGloss) tex = 1.0f - tex;
         out *= tex;
     }
@@ -71,7 +88,8 @@ float Material::getRoughnessAt(double u, double v) const
 Vector3f Material::applyNormalMap(double u, double v,
                                   const Vector3f& N,
                                   const Vector3f& T,
-                                  const Vector3f& B) const
+                                  const Vector3f& B,
+                                  float lod) const
 {
     if ((!normalTexture || !normalTexture->valid()) &&
         (!bumpTexture || !bumpTexture->valid())) {
@@ -88,7 +106,7 @@ Vector3f Material::applyNormalMap(double u, double v,
 
     Vector3f mapped(0.0f, 0.0f, 1.0f);
     if (normalTexture && normalTexture->valid()) {
-        Vector3f texel = normalTexture->sample(static_cast<float>(u), static_cast<float>(v));
+        Vector3f texel = normalTexture->sample(static_cast<float>(u), static_cast<float>(v), lod);
         mapped = normalize(Vector3f(texel.x * 2.0f - 1.0f,
                                     texel.y * 2.0f - 1.0f,
                                     texel.z * 2.0f - 1.0f));

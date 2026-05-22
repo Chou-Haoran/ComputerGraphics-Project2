@@ -71,19 +71,31 @@ public:
         area = crossProduct(e1, e2).norm()*0.5f;
     }
 
+    void computeTexturePartials(Vector3f& dpdu, Vector3f& dpdv) const
+    {
+        const float du1 = t1.x - t0.x;
+        const float dv1 = t1.y - t0.y;
+        const float du2 = t2.x - t0.x;
+        const float dv2 = t2.y - t0.y;
+        const float det = du1 * dv2 - dv1 * du2;
+
+        if (std::fabs(det) > 1e-8f) {
+            dpdu = (e1 * dv2 - e2 * dv1) / det;
+            dpdv = (e2 * du1 - e1 * du2) / det;
+            return;
+        }
+
+        dpdu = e1;
+        dpdv = e2;
+    }
+
     void computeTangentFrame(const Vector3f& shadingNormal,
                              Vector3f& tangent,
                              Vector3f& bitangent) const
     {
-        float du1 = t1.x - t0.x;
-        float dv1 = t1.y - t0.y;
-        float du2 = t2.x - t0.x;
-        float dv2 = t2.y - t0.y;
-        float det = du1 * dv2 - dv1 * du2;
-
-        if (std::fabs(det) > 1e-8f) {
-            tangent = (e1 * dv2 - e2 * dv1) / det;
-            bitangent = (e2 * du1 - e1 * du2) / det;
+        computeTexturePartials(tangent, bitangent);
+        if (std::fabs(dotProduct(tangent, tangent)) > 1e-8f ||
+            std::fabs(dotProduct(bitangent, bitangent)) > 1e-8f) {
             tangent = tangent - shadingNormal * dotProduct(tangent, shadingNormal);
             bitangent = bitangent - shadingNormal * dotProduct(bitangent, shadingNormal);
         } else {
@@ -129,7 +141,9 @@ public:
         const float b2 = x * y;
         pos.coords = v0 * b0 + v1 * b1 + v2 * b2;
         pos.normal = normalize(n0 * b0 + n1 * b1 + n2 * b2);
+        computeTexturePartials(pos.dpdu, pos.dpdv);
         computeTangentFrame(pos.normal, pos.tangent, pos.bitangent);
+        pos.tcoords = t0 * b0 + t1 * b1 + t2 * b2;
         pdf = 1.0f / area;
     }
     float getArea() override {
@@ -450,10 +464,12 @@ inline Intersection Triangle::getIntersection(Ray ray)
     }
 
     inter.happened = true;
+    const float w = 1.0f - u - v;
     inter.coords = ray.origin + ray.direction * t;
-    inter.normal = normalize(n0 * (1.0f - u - v) + n1 * u + n2 * v);
+    inter.normal = normalize(n0 * w + n1 * u + n2 * v);
+    computeTexturePartials(inter.dpdu, inter.dpdv);
     computeTangentFrame(inter.normal, inter.tangent, inter.bitangent);
-    inter.tcoords = Vector2f(u, v);
+    inter.tcoords = t0 * w + t1 * u + t2 * v;
     inter.tnear = t;
     inter.obj = this;
     inter.material = m;
@@ -462,6 +478,5 @@ inline Intersection Triangle::getIntersection(Ray ray)
 
 inline Vector3f Triangle::evalDiffuseColor(const Vector2f& st) const
 {
-    auto uv = t0 * (1 - st.x - st.y) + t1 * st.x + t2 * st.y;
-    return m->getColorAt(uv.x, uv.y);
+    return m->getColorAt(st.x, st.y);
 }

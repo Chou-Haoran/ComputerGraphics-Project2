@@ -7,7 +7,7 @@
 
 namespace ImageIO {
 
-// Writes a binary P6 PPM with sRGB-ish gamma (exponent 0.6, mirroring Task-2).
+// Writes the framebuffer with Reinhard tone mapping followed by 2.2 gamma.
 void writePPM(const std::string& path,
               const std::vector<Vector3f>& fb,
               int w, int h);

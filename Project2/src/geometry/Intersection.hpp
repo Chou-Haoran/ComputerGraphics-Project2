@@ -14,9 +14,12 @@ struct Intersection
     Intersection(){
         happened=false;
         coords=Vector3f();
+        tcoords=Vector2f();
         normal=Vector3f();
         tangent=Vector3f();
         bitangent=Vector3f();
+        dpdu=Vector3f();
+        dpdv=Vector3f();
         tnear= std::numeric_limits<double>::max();
         obj =nullptr;
         material=nullptr;
@@ -27,6 +30,8 @@ struct Intersection
     Vector3f normal;
     Vector3f tangent;
     Vector3f bitangent;
+    Vector3f dpdu;
+    Vector3f dpdv;
     double tnear;  // the distance between the intersection point and the ray origin
     Object* obj;
     Material* material;

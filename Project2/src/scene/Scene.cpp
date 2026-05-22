@@ -1,9 +1,18 @@
 #include "Scene.hpp"
+#include "Camera.hpp"
 #include "Material.hpp"
 #include <algorithm>
 #include <cmath>
 
 namespace {
+struct TextureFootprint {
+    float uvSpanU = 0.0f;
+    float uvSpanV = 0.0f;
+    float rhoU = 0.0f;
+    float rhoV = 0.0f;
+    float lod = 0.0f;
+};
+
 Vector3f offsetRayOrigin(const Vector3f& point, const Vector3f& normal, const Vector3f& dir)
 {
     return dotProduct(dir, normal) < 0 ? point - normal * EPSILON
@@ -15,6 +24,39 @@ float powerHeuristic(float pdfA, float pdfB)
     float a2 = pdfA * pdfA;
     float b2 = pdfB * pdfB;
     return a2 / std::max(a2 + b2, 1e-8f);
+}
+
+TextureFootprint estimateTextureFootprint(const Scene& scene,
+                                          const Ray& ray,
+                                          const Intersection& inter,
+                                          const Texture* texture)
+{
+    TextureFootprint fp;
+    if (!texture || !texture->valid() ||
+        inter.dpdu.norm() < EPSILON || inter.dpdv.norm() < EPSILON ||
+        scene.height <= 0) {
+        return fp;
+    }
+
+    const float fovY = deg2rad(scene.camera ? scene.camera->fov()
+                                            : static_cast<float>(scene.fov));
+    const float hitDistance = std::max(static_cast<float>(inter.tnear), 1e-4f);
+    const float pixelWorld = (2.0f * hitDistance * std::tan(0.5f * fovY)) /
+                             static_cast<float>(scene.height);
+    const float ndotv = std::max(std::fabs(dotProduct(normalize(inter.normal),
+                                                      normalize(-ray.direction))),
+                                 0.15f);
+    const float surfaceFootprint = pixelWorld / ndotv;
+    fp.uvSpanU = surfaceFootprint / std::max(inter.dpdu.norm(), 1e-6f);
+    fp.uvSpanV = surfaceFootprint / std::max(inter.dpdv.norm(), 1e-6f);
+    fp.rhoU = fp.uvSpanU * static_cast<float>(texture->width());
+    fp.rhoV = fp.uvSpanV * static_cast<float>(texture->height());
+    const float rho = std::max(fp.rhoU, fp.rhoV);
+
+    if (rho > 1.0f) {
+        fp.lod = clamp(0.0f, texture->maxLod(), std::log2(rho));
+    }
+    return fp;
 }
 }
 
@@ -111,12 +153,21 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
     Vector2f st         = inter.tcoords;
     Vector3f N          = normalize(inter.normal);
     Vector3f viewDir    = normalize(-ray.direction);
-    Vector3f surfaceCol = inter.obj->evalDiffuseColor(st);
+    const TextureFootprint diffuseFp =
+        estimateTextureFootprint(*this, ray, inter, inter.material->diffuseTexture);
+    const TextureFootprint normalFp =
+        estimateTextureFootprint(*this, ray, inter, inter.material->normalTexture);
+    const TextureFootprint roughnessFp =
+        estimateTextureFootprint(*this, ray, inter, inter.material->roughnessTexture);
+    Vector3f surfaceCol = inter.material->getColorAtAnisotropic(st.x, st.y,
+                                                                diffuseFp.uvSpanU,
+                                                                diffuseFp.uvSpanV);
     if (inter.material->normalTexture && inter.material->normalTexture->valid()) {
-        N = inter.material->applyNormalMap(st.x, st.y, N, inter.tangent, inter.bitangent);
+        N = inter.material->applyNormalMap(st.x, st.y, N, inter.tangent, inter.bitangent,
+                                           normalFp.lod);
         if (dotProduct(N, viewDir) < 0.0f) N = -N;
     }
-    float surfaceRoughness = inter.material->getRoughnessAt(st.x, st.y);
+    float surfaceRoughness = inter.material->getRoughnessAt(st.x, st.y, roughnessFp.lod);
     MaterialInteraction interaction = inter.material->resolveInteraction(ray.direction, N);
     if (interaction.kind == MaterialInteractionKind::Emission) {
         return interaction.emission;

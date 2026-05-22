@@ -1,5 +1,6 @@
 #include "Texture.hpp"
 
+#include "global.hpp"
 #include "stb_image.h"
 
 #include <algorithm>
@@ -38,15 +39,9 @@ bool nextToken(std::istream& in, std::string& tok)
 
 } // namespace
 
-Texture::~Texture()
-{
-    reset();
-}
-
 void Texture::reset()
 {
-    delete[] data;
-    data = nullptr;
+    mips.clear();
     w = 0;
     h = 0;
     channels = 0;
@@ -60,11 +55,15 @@ void Texture::assign(std::vector<unsigned char>&& pixels,
     reset();
     if (pixels.empty() || width <= 0 || height <= 0 || numChannels <= 0) return;
 
-    data = new unsigned char[pixels.size()];
-    std::copy(pixels.begin(), pixels.end(), data);
+    MipLevel base;
+    base.data = std::move(pixels);
+    base.width = width;
+    base.height = height;
+    mips.push_back(std::move(base));
     w = width;
     h = height;
     channels = numChannels;
+    buildMipChain();
 }
 
 bool Texture::load(const std::string& path)
@@ -139,59 +138,158 @@ bool Texture::loadPPM(const std::string& path)
     return valid();
 }
 
-Vector3f Texture::sampleTexel(int x, int y) const
+void Texture::buildMipChain()
 {
-    x = std::clamp(x, 0, w - 1);
-    y = std::clamp(y, 0, h - 1);
+    while (!mips.empty()) {
+        const MipLevel& prev = mips.back();
+        if (prev.width == 1 && prev.height == 1) break;
 
-    int idx = (y * w + x) * channels;
+        MipLevel next;
+        next.width = std::max(1, prev.width / 2);
+        next.height = std::max(1, prev.height / 2);
+        next.data.resize(static_cast<size_t>(next.width) * next.height * channels);
+
+        for (int y = 0; y < next.height; ++y) {
+            for (int x = 0; x < next.width; ++x) {
+                for (int c = 0; c < channels; ++c) {
+                    int accum = 0;
+                    int count = 0;
+                    for (int oy = 0; oy < 2; ++oy) {
+                        for (int ox = 0; ox < 2; ++ox) {
+                            const int srcX = std::min(prev.width - 1, x * 2 + ox);
+                            const int srcY = std::min(prev.height - 1, y * 2 + oy);
+                            const int srcIdx = (srcY * prev.width + srcX) * channels + c;
+                            accum += prev.data[static_cast<size_t>(srcIdx)];
+                            ++count;
+                        }
+                    }
+
+                    const int dstIdx = (y * next.width + x) * channels + c;
+                    next.data[static_cast<size_t>(dstIdx)] =
+                        static_cast<unsigned char>((accum + count / 2) / count);
+                }
+            }
+        }
+
+        mips.push_back(std::move(next));
+    }
+}
+
+Vector3f Texture::sampleTexel(const MipLevel& level, int x, int y) const
+{
+    x = std::clamp(x, 0, level.width - 1);
+    y = std::clamp(y, 0, level.height - 1);
+
+    const int idx = (y * level.width + x) * channels;
     constexpr float inv255 = 1.0f / 255.0f;
 
     if (channels == 1) {
-        float c = data[idx] * inv255;
+        const float c = level.data[static_cast<size_t>(idx)] * inv255;
         return Vector3f(c, c, c);
     }
 
     if (channels == 2) {
-        float c = data[idx] * inv255;
+        const float c = level.data[static_cast<size_t>(idx)] * inv255;
         return Vector3f(c, c, c);
     }
 
-    return Vector3f(data[idx + 0] * inv255,
-                    data[idx + 1] * inv255,
-                    data[idx + 2] * inv255);
+    return Vector3f(level.data[static_cast<size_t>(idx + 0)] * inv255,
+                    level.data[static_cast<size_t>(idx + 1)] * inv255,
+                    level.data[static_cast<size_t>(idx + 2)] * inv255);
 }
 
-Vector3f Texture::sample(float u, float v) const
+Vector3f Texture::sampleBilinear(const MipLevel& level, float u, float v) const
 {
     if (!valid()) return Vector3f(1.0f, 1.0f, 1.0f);
 
     u = wrapUnit(u);
     v = wrapUnit(v);
 
-    float fx = u * static_cast<float>(w - 1);
-    float fy = (1.0f - v) * static_cast<float>(h - 1);
+    const float fx = u * static_cast<float>(level.width - 1);
+    const float fy = (1.0f - v) * static_cast<float>(level.height - 1);
 
-    int x0 = static_cast<int>(std::floor(fx));
-    int y0 = static_cast<int>(std::floor(fy));
-    int x1 = std::min(x0 + 1, w - 1);
-    int y1 = std::min(y0 + 1, h - 1);
+    const int x0 = static_cast<int>(std::floor(fx));
+    const int y0 = static_cast<int>(std::floor(fy));
+    const int x1 = std::min(x0 + 1, level.width - 1);
+    const int y1 = std::min(y0 + 1, level.height - 1);
 
-    float tx = fx - static_cast<float>(x0);
-    float ty = fy - static_cast<float>(y0);
+    const float tx = fx - static_cast<float>(x0);
+    const float ty = fy - static_cast<float>(y0);
 
-    Vector3f c00 = sampleTexel(x0, y0);
-    Vector3f c10 = sampleTexel(x1, y0);
-    Vector3f c01 = sampleTexel(x0, y1);
-    Vector3f c11 = sampleTexel(x1, y1);
+    const Vector3f c00 = sampleTexel(level, x0, y0);
+    const Vector3f c10 = sampleTexel(level, x1, y0);
+    const Vector3f c01 = sampleTexel(level, x0, y1);
+    const Vector3f c11 = sampleTexel(level, x1, y1);
 
-    Vector3f cx0 = lerpVec(c00, c10, tx);
-    Vector3f cx1 = lerpVec(c01, c11, tx);
+    const Vector3f cx0 = lerpVec(c00, c10, tx);
+    const Vector3f cx1 = lerpVec(c01, c11, tx);
     return lerpVec(cx0, cx1, ty);
+}
+
+Vector3f Texture::sample(float u, float v) const
+{
+    return sample(u, v, 0.0f);
+}
+
+Vector3f Texture::sampleLevel(float u, float v, int level) const
+{
+    if (!valid()) return Vector3f(1.0f, 1.0f, 1.0f);
+    const int clampedLevel = std::clamp(level, 0, mipLevels() - 1);
+    return sampleBilinear(mips[static_cast<size_t>(clampedLevel)], u, v);
+}
+
+Vector3f Texture::sample(float u, float v, float lod) const
+{
+    if (!valid()) return Vector3f(1.0f, 1.0f, 1.0f);
+
+    const float clampedLod = clamp(0.0f, maxLod(), lod);
+    const int level0 = static_cast<int>(std::floor(clampedLod));
+    const int level1 = std::min(level0 + 1, mipLevels() - 1);
+    const float t = clampedLod - static_cast<float>(level0);
+
+    const Vector3f c0 = sampleLevel(u, v, level0);
+    const Vector3f c1 = sampleLevel(u, v, level1);
+    return lerpVec(c0, c1, t);
+}
+
+Vector3f Texture::sampleAnisotropic(float u, float v,
+                                    float footprintU, float footprintV,
+                                    int maxSamples) const
+{
+    if (!valid()) return Vector3f(1.0f, 1.0f, 1.0f);
+
+    const float rhoU = std::fabs(footprintU) * static_cast<float>(width());
+    const float rhoV = std::fabs(footprintV) * static_cast<float>(height());
+    const float majorRho = std::max(rhoU, rhoV);
+    const float minorRho = std::max(std::min(rhoU, rhoV), 1.0f);
+    const float anisotropy = majorRho / minorRho;
+
+    if (majorRho <= 1.0f || anisotropy <= 1.5f || maxSamples <= 1) {
+        const float lod = majorRho > 1.0f ? std::log2(majorRho) : 0.0f;
+        return sample(u, v, lod);
+    }
+
+    const bool majorIsU = rhoU >= rhoV;
+    const float minorLod = std::log2(minorRho);
+    const int taps = std::clamp(static_cast<int>(std::ceil(anisotropy)), 2, maxSamples);
+
+    Vector3f accum(0.0f);
+    for (int i = 0; i < taps; ++i) {
+        const float offset = ((static_cast<float>(i) + 0.5f) / static_cast<float>(taps)) - 0.5f;
+        const float sampleU = majorIsU ? u + offset * footprintU : u;
+        const float sampleV = majorIsU ? v : v + offset * footprintV;
+        accum += sample(sampleU, sampleV, minorLod);
+    }
+    return accum / static_cast<float>(taps);
 }
 
 float Texture::sampleScalar(float u, float v) const
 {
-    Vector3f rgb = sample(u, v);
+    return sampleScalar(u, v, 0.0f);
+}
+
+float Texture::sampleScalar(float u, float v, float lod) const
+{
+    const Vector3f rgb = sample(u, v, lod);
     return std::clamp(0.2126f * rgb.x + 0.7152f * rgb.y + 0.0722f * rgb.z, 0.0f, 1.0f);
 }

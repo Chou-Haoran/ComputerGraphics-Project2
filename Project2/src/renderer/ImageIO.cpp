@@ -7,6 +7,17 @@
 
 namespace ImageIO {
 
+namespace {
+
+unsigned char encodeDisplay(float x)
+{
+    const float mapped = x / (1.0f + std::max(x, 0.0f));
+    const float gammaEncoded = std::pow(clamp(0.0f, 1.0f, mapped), 1.0f / 2.2f);
+    return static_cast<unsigned char>(255.0f * gammaEncoded);
+}
+
+} // namespace
+
 void writePPM(const std::string& path,
               const std::vector<Vector3f>& fb,
               int w, int h)
@@ -19,9 +30,9 @@ void writePPM(const std::string& path,
     std::fprintf(fp, "P6\n%d %d\n255\n", w, h);
     for (int i = 0; i < w * h; ++i) {
         unsigned char rgb[3];
-        rgb[0] = (unsigned char)(255 * std::pow(clamp(0, 1, fb[i].x), 0.6f));
-        rgb[1] = (unsigned char)(255 * std::pow(clamp(0, 1, fb[i].y), 0.6f));
-        rgb[2] = (unsigned char)(255 * std::pow(clamp(0, 1, fb[i].z), 0.6f));
+        rgb[0] = encodeDisplay(fb[i].x);
+        rgb[1] = encodeDisplay(fb[i].y);
+        rgb[2] = encodeDisplay(fb[i].z);
         std::fwrite(rgb, 1, 3, fp);
     }
     std::fclose(fp);
@@ -33,9 +44,9 @@ void writePNG(const std::string& path,
 {
     std::vector<unsigned char> bytes(static_cast<size_t>(w) * h * 3);
     for (int i = 0; i < w * h; ++i) {
-        bytes[i * 3 + 0] = static_cast<unsigned char>(255 * std::pow(clamp(0, 1, fb[i].x), 0.6f));
-        bytes[i * 3 + 1] = static_cast<unsigned char>(255 * std::pow(clamp(0, 1, fb[i].y), 0.6f));
-        bytes[i * 3 + 2] = static_cast<unsigned char>(255 * std::pow(clamp(0, 1, fb[i].z), 0.6f));
+        bytes[i * 3 + 0] = encodeDisplay(fb[i].x);
+        bytes[i * 3 + 1] = encodeDisplay(fb[i].y);
+        bytes[i * 3 + 2] = encodeDisplay(fb[i].z);
     }
 
     if (stbi_write_png(path.c_str(), w, h, 3, bytes.data(), w * 3) == 0) {
