@@ -25,6 +25,7 @@ public:
 
     // Strength multiplier to mix env intensity with backgroundColor.
     float intensity = 1.0f;
+    float rotationYDegrees = 0.0f;
 
     // TODO: importance sampling of envmap luminance (alias method or
     // 2D inverse-CDF) — yields much lower variance on glossy/glass hits.

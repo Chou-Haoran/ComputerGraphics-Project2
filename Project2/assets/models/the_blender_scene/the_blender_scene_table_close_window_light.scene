@@ -1,0 +1,138 @@
+# Table close view with two window area lights.
+#
+# Run from Project2:
+#   .\build\Project2Renderer.exe assets/models/the_blender_scene the_blender_scene_table_close_window_light 800x400 32
+
+render {
+    width                = 1200
+    height               = 600
+    spp                  = 64
+    depth                = 8
+    shadows              = true
+    adaptiveSampling     = true
+    adaptiveMinSpp       = 16
+    adaptiveBatch        = 8
+    adaptiveThreshold    = 0.08
+    denoise              = true
+    denoiseRadius        = 3
+    denoiseSigmaSpatial  = 2.0
+    denoiseSigmaColor    = 0.15
+    denoiseSigmaNormal   = 0.2
+    denoiseSigmaAlbedo   = 0.25
+    bg                   = 0.005 0.005 0.008
+}
+
+camera {
+    pos       = 1.430 1.100 0.820
+    lookAt    = 2.470 0.960 0.420
+    up        = 0.021 0.999 -0.034
+    fov       = 62
+    aperture  = 0.0
+    focus     = 1.12
+}
+
+envmap "../../envmaps/typewriter_studio_soft.hdr" {
+    intensity = 0.08
+    rotationY = 0.0
+}
+
+mesh "blender.obj" {
+    materialMap = "the_blender_scene_export.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+# Cool daylight panels placed outside the two glass wall/window sections.
+# Glass and curtain shadow transmission in the material map lets this light
+# enter the room without treating those surfaces as fully opaque blockers.
+light {
+    type      = AREA_RECT
+    pos       = 3.080 0.140 1.450
+    normal    = -1.000 0.000 0.000
+    size      = 0.850 0.560 0.000
+    emission  = 0.620 0.760 1.000
+    intensity = 0.75
+    enabled   = true
+}
+
+light {
+    type      = AREA_RECT
+    pos       = 3.080 2.140 1.450
+    normal    = -1.000 0.000 0.000
+    size      = 0.850 0.560 0.000
+    emission  = 0.620 0.760 1.000
+    intensity = 0.75
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = 0.370 2.572 -0.040
+    radius    = 0.120
+    emission  = 1.000 0.823 0.533
+    intensity = 180.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = 0.629 2.572 -0.492
+    radius    = 0.120
+    emission  = 1.000 0.778 0.485
+    intensity = 180.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = 0.369 2.572 -0.921
+    radius    = 0.120
+    emission  = 1.000 0.752 0.450
+    intensity = 180.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = -0.160 2.572 -0.942
+    radius    = 0.110
+    emission  = 1.000 0.731 0.389
+    intensity = 220.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = -0.416 2.572 -0.471
+    radius    = 0.120
+    emission  = 1.000 0.773 0.354
+    intensity = 180.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = 2.384 1.491 1.412
+    radius    = 0.120
+    emission  = 1.000 0.731 0.389
+    intensity = 70.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = 2.373 1.520 1.410
+    radius    = 0.045
+    emission  = 1.000 0.900 0.700
+    intensity = 460.0
+    enabled   = true
+}
+
+light {
+    type      = DIRECTIONAL
+    dir       = -0.623 -0.613 0.485
+    emission  = 1.000 0.929 0.849
+    intensity = 7.0
+    enabled   = true
+}

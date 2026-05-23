@@ -1,4 +1,7 @@
 build/
+build-ninja/
+output/the_blender_scene_table_close_window_light*.ppm
+output/the_blender_scene_table_close_window_light*.png
 *.DS_Store
 .cache/
 .vscode/

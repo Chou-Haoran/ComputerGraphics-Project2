@@ -47,6 +47,8 @@ struct MaterialConfig {
     bool roughnessTexIsGloss = false;
     float bumpScale = 0.05f;
     float roughness = 0.5f;
+    float shadowTransmission = 0.0f;
+    Vector3f shadowTint = Vector3f(1.0f);
 };
 
 class Material {
@@ -78,6 +80,7 @@ public:
                             const Vector3f& T,
                             const Vector3f& B,
                             float lod = 0.0f) const;
+    Vector3f getShadowTransmittanceAt(double u, double v, float lod = 0.0f) const;
     Vector3f getEmission() const;
     bool hasEmission() const;
 
@@ -102,6 +105,8 @@ public:
     bool roughnessTexIsGloss;
     float bumpScale;
     float roughness;
+    float shadowTransmission;
+    Vector3f shadowTint;
 
 protected:
     Vector3f reflect(const Vector3f& I, const Vector3f& N) const;

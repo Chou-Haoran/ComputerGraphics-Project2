@@ -27,12 +27,25 @@ Material::Material(const MaterialConfig& config)
       roughnessTexPath(config.roughnessTexPath),
       roughnessTexIsGloss(config.roughnessTexIsGloss),
       bumpScale(config.bumpScale),
-      roughness(config.roughness)
+      roughness(config.roughness),
+      shadowTransmission(config.shadowTransmission),
+      shadowTint(config.shadowTint)
 {
 }
 
 Vector3f Material::getColor() const { return m_color; }
 Vector3f Material::getEmission() const { return m_emission; }
+
+Vector3f Material::getShadowTransmittanceAt(double u, double v, float lod) const
+{
+    float amount = clamp(0.0f, 1.0f, shadowTransmission);
+    if (amount <= 0.0f) return Vector3f(0.0f);
+
+    Vector3f tint = Vector3f(clamp(0.0f, 1.0f, shadowTint.x),
+                             clamp(0.0f, 1.0f, shadowTint.y),
+                             clamp(0.0f, 1.0f, shadowTint.z));
+    return tint * getColorAt(u, v, lod) * amount;
+}
 
 bool Material::hasEmission() const
 {

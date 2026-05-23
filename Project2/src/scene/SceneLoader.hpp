@@ -36,6 +36,8 @@ struct MeshSpec {
     std::optional<std::string>  roughnessTex;
     bool                       roughnessTexIsGloss = false;
     std::optional<float>       bumpScale;
+    std::optional<float>       shadowTransmission;
+    std::optional<Vector3f>    shadowTint;
 };
 
 struct CameraSpec {
@@ -54,6 +56,7 @@ struct SceneDescriptor {
 
     std::string envmapPath;
     float       envmapIntensity = 1.0f;
+    float       envmapRotationY = 0.0f;
 
     int      width  = 800;
     int      height = 600;

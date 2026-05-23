@@ -20,6 +20,14 @@ Vector3f lerpVec(const Vector3f& a, const Vector3f& b, float t)
     return a * (1.0f - t) + b * t;
 }
 
+Vector3f rotateY(const Vector3f& v, float degrees)
+{
+    float r = deg2rad(degrees);
+    float c = std::cos(r);
+    float s = std::sin(r);
+    return Vector3f(c * v.x + s * v.z, v.y, -s * v.x + c * v.z);
+}
+
 float luminance(const Vector3f& c)
 {
     return 0.2126f * c.x + 0.7152f * c.y + 0.0722f * c.z;
@@ -101,7 +109,7 @@ Vector3f EnvironmentMap::sample(const Vector3f& dir) const
 
 void EnvironmentMap::directionToUV(const Vector3f& dir, float& u, float& v) const
 {
-    Vector3f d = normalize(dir);
+    Vector3f d = normalize(rotateY(dir, -rotationYDegrees));
     float theta = std::acos(clamp(-1.0f, 1.0f, d.y));
     float phi = std::atan2(d.z, d.x);
     if (phi < 0.0f) phi += 2.0f * M_PI;
@@ -184,7 +192,11 @@ bool EnvironmentMap::sampleDirection(Vector3f& dir, Vector3f& radiance, float& p
     float phi = u * 2.0f * static_cast<float>(M_PI);
     float sinTheta = std::sin(theta);
     float cosTheta = std::cos(theta);
-    dir = Vector3f(std::cos(phi) * sinTheta, cosTheta, std::sin(phi) * sinTheta);
+    dir = rotateY(Vector3f(std::cos(phi) * sinTheta,
+                           cosTheta,
+                           std::sin(phi) * sinTheta),
+                  rotationYDegrees);
+    dir = normalize(dir);
     radiance = sample(dir);
     pdfOut = pdf(dir);
     return pdfOut > 0.0f;

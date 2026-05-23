@@ -80,6 +80,8 @@ struct MaterialOverrideSpec {
     std::optional<std::string>  roughnessTex;
     std::optional<bool>         roughnessTexIsGloss;
     std::optional<float>        bumpScale;
+    std::optional<float>        shadowTransmission;
+    std::optional<Vector3f>     shadowTint;
 };
 
 struct MaterialMapConfig {
@@ -264,7 +266,8 @@ private:
             while (!match(Token::Symbol, "}")) {
                 std::string f = parseIdent();
                 expect(Token::Symbol, "=");
-                if (f == "intensity") d.envmapIntensity = parseNum();
+                if      (f == "intensity") d.envmapIntensity = parseNum();
+                else if (f == "rotationY") d.envmapRotationY = parseNum();
                 else errorAt("unknown envmap field: " + f);
             }
         }
@@ -292,6 +295,8 @@ private:
             else if (f == "bumpTex")      m.bumpTex      = parseStr();
             else if (f == "roughnessTex") m.roughnessTex = parseStr();
             else if (f == "bumpScale")    m.bumpScale    = parseNum();
+            else if (f == "shadowTransmission") m.shadowTransmission = parseNum();
+            else if (f == "shadowTint")         m.shadowTint = parseV3();
             else errorAt("unknown mesh field: " + f);
         }
         d.meshes.push_back(std::move(m));
@@ -422,6 +427,8 @@ private:
             else if (f == "roughnessTex")        spec.roughnessTex = parseStr();
             else if (f == "roughnessTexIsGloss") spec.roughnessTexIsGloss = parseBool();
             else if (f == "bumpScale")           spec.bumpScale = parseNum();
+            else if (f == "shadowTransmission")  spec.shadowTransmission = parseNum();
+            else if (f == "shadowTint")          spec.shadowTint = parseV3();
             else errorAt("unknown mtl field: " + f);
         }
         cfg.overrides[materialName] = std::move(spec);
@@ -661,7 +668,7 @@ LoadedScene SceneLoader::load(const std::string& sceneDir,
         }
 
         objl::Loader loader;
-        if (!loader.LoadFile(objPath.string())) {
+        if (!loader.LoadFile(objPath.generic_string())) {
             std::cerr << "SceneLoader: WARN failed to load OBJ " << objPath << "\n";
             continue;
         }
@@ -708,6 +715,12 @@ LoadedScene SceneLoader::load(const std::string& sceneDir,
                 materialMap.defaultRoughnessMin) {
                 config.roughness = std::max(config.roughness, *materialMap.defaultRoughnessMin);
             }
+            config.shadowTransmission = meshSpec.shadowTransmission.value_or(
+                override && override->shadowTransmission
+                    ? *override->shadowTransmission
+                    : (materialType == "GLASS" ? 0.85f : 0.0f));
+            config.shadowTint = meshSpec.shadowTint.value_or(
+                override && override->shadowTint ? *override->shadowTint : Vector3f(1.0f));
             if (srcMaterial) {
                 config.Kd = clamp(0.0f, 1.0f, maxComponent(toVector3f(srcMaterial->Kd)));
                 config.Ks = clamp(0.0f, 1.0f, maxComponent(toVector3f(srcMaterial->Ks)));
@@ -987,6 +1000,7 @@ LoadedScene SceneLoader::load(const std::string& sceneDir,
     if (!desc.envmapPath.empty()) {
         auto env = std::make_unique<EnvironmentMap>();
         env->intensity = desc.envmapIntensity;
+        env->rotationYDegrees = desc.envmapRotationY;
         bool ok = env->loadHDR(resolveRelative(sceneRoot, desc.envmapPath).string());
         if (!ok) {
             std::cerr << "SceneLoader: env-map \"" << desc.envmapPath

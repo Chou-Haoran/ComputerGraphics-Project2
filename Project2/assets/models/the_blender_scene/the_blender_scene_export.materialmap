@@ -27,6 +27,8 @@ mtl "Curtain" {
     color = 1.00 1.00 1.00
     roughness = 0.88
     Ks = 0.03
+    shadowTransmission = 0.22
+    shadowTint = 0.78 0.72 0.62
     diffuseTex = "textures/T_Curtain_01_A.tga.png"
     roughnessTex = "textures/T_Curtain_01_R.jpg"
     roughnessTexIsGloss = true
@@ -54,6 +56,8 @@ mtl "Gass" {
     ior = 1.45
     roughness = 0.06
     Ks = 0.02
+    shadowTransmission = 0.92
+    shadowTint = 0.92 0.96 1.00
     diffuseTex = "textures/T_Glass_01_A.tga.png"
     roughnessTex = "textures/T_Glass_01_R.tga.png"
     roughnessTexIsGloss = true
@@ -67,6 +71,8 @@ mtl "Lampshade" {
     color = 1.00 1.00 1.00
     roughness = 0.82
     Ks = 0.05
+    shadowTransmission = 0.18
+    shadowTint = 1.00 0.88 0.70
     diffuseTex = "textures/T_Lampshade_01_A.tga.png"
     roughnessTex = "textures/T_Lampshade_01_R.tga.png"
     roughnessTexIsGloss = true

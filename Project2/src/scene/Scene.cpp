@@ -3,6 +3,7 @@
 #include "Material.hpp"
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 namespace {
 struct TextureFootprint {
@@ -24,6 +25,60 @@ float powerHeuristic(float pdfA, float pdfB)
     float a2 = pdfA * pdfA;
     float b2 = pdfB * pdfB;
     return a2 / std::max(a2 + b2, 1e-8f);
+}
+
+float maxComponent(const Vector3f& v)
+{
+    return std::max(v.x, std::max(v.y, v.z));
+}
+
+Vector3f shadowTransmittance(const Scene& scene,
+                             const Vector3f& point,
+                             const Vector3f& normal,
+                             const Vector3f& dir,
+                             float maxDistance,
+                             bool infiniteDistance)
+{
+    if (!scene.shadowsEnabled) return Vector3f(1.0f);
+
+    Vector3f throughput(1.0f);
+    Ray shadowRay(offsetRayOrigin(point, normal, dir), dir);
+    float remaining = maxDistance;
+
+    for (int depth = 0; depth < 8; ++depth) {
+        Intersection shadowHit = scene.intersect(shadowRay);
+        if (!shadowHit.happened) return throughput;
+
+        if (!infiniteDistance &&
+            shadowHit.tnear + 5.0f * EPSILON >= remaining) {
+            return throughput;
+        }
+
+        if (!shadowHit.material) return Vector3f(0.0f);
+
+        Vector3f pass = shadowHit.material->getShadowTransmittanceAt(
+            shadowHit.tcoords.x, shadowHit.tcoords.y);
+        if (maxComponent(pass) <= 1e-4f) {
+            return Vector3f(0.0f);
+        }
+
+        throughput = throughput * pass;
+        if (maxComponent(throughput) <= 1e-4f) {
+            return Vector3f(0.0f);
+        }
+
+        if (!infiniteDistance) {
+            remaining -= static_cast<float>(shadowHit.tnear);
+            if (remaining <= EPSILON) return throughput;
+        }
+
+        shadowRay = Ray(offsetRayOrigin(shadowHit.coords,
+                                        normalize(shadowHit.normal),
+                                        dir),
+                        dir);
+    }
+
+    return Vector3f(0.0f);
 }
 
 TextureFootprint estimateTextureFootprint(const Scene& scene,
@@ -204,19 +259,11 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
         if (light && light->sampleLi(hitPoint, sample)) {
             float analyticCosTheta = std::max(0.0f, dotProduct(N, sample.direction));
             if (analyticCosTheta > 0.0f) {
-                bool visible = true;
-                if (shadowsEnabled) {
-                    Ray shadowRay(offsetRayOrigin(hitPoint, N, sample.direction), sample.direction);
-                    Intersection shadowHit = intersect(shadowRay);
-                    if (sample.infiniteDistance) {
-                        visible = !shadowHit.happened;
-                    } else {
-                        visible = !shadowHit.happened ||
-                                  shadowHit.tnear + 5.0f * EPSILON >= sample.maxDistance;
-                    }
-                }
-
-                if (visible) {
+                Vector3f visibility = shadowTransmittance(*this, hitPoint, N,
+                                                          sample.direction,
+                                                          sample.maxDistance,
+                                                          sample.infiniteDistance);
+                if (maxComponent(visibility) > 0.0f) {
                     Vector3f brdf = inter.material->eval(viewDir, sample.direction, N,
                                                          surfaceCol, surfaceRoughness,
                                                          surfaceMetallic);
@@ -229,7 +276,7 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
                         weight = powerHeuristic(lightPdf, bsdfPdf);
                     }
 
-                    directLight += sample.radiance * brdf * analyticCosTheta * weight /
+                    directLight += sample.radiance * visibility * brdf * analyticCosTheta * weight /
                                    std::max(lightPdf, 1e-8f);
                 }
             }
@@ -243,14 +290,11 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
         if (envmap->sampleDirection(envDir, envRadiance, envPdf)) {
             float envCosTheta = std::max(0.0f, dotProduct(N, envDir));
             if (envCosTheta > 0.0f && envPdf > 0.0f) {
-                bool visible = true;
-                if (shadowsEnabled) {
-                    Ray shadowRay(offsetRayOrigin(hitPoint, N, envDir), envDir);
-                    Intersection shadowHit = intersect(shadowRay);
-                    visible = !shadowHit.happened;
-                }
-
-                if (visible) {
+                Vector3f visibility = shadowTransmittance(*this, hitPoint, N,
+                                                          envDir,
+                                                          std::numeric_limits<float>::infinity(),
+                                                          true);
+                if (maxComponent(visibility) > 0.0f) {
                     Vector3f brdf = inter.material->eval(viewDir, envDir, N,
                                                          surfaceCol, surfaceRoughness,
                                                          surfaceMetallic);
@@ -258,7 +302,7 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
                                                         surfaceCol, surfaceRoughness,
                                                         surfaceMetallic);
                     float weight = powerHeuristic(envPdf, bsdfPdf);
-                    directLight += envRadiance * brdf * envCosTheta * weight /
+                    directLight += envRadiance * visibility * brdf * envCosTheta * weight /
                                    std::max(envPdf, 1e-8f);
                 }
             }
