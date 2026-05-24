@@ -20,14 +20,18 @@ Material::Material(const MaterialConfig& config)
       normalTexture(config.normalTexture),
       bumpTexture(config.bumpTexture),
       roughnessTexture(config.roughnessTexture),
+      displacementTexture(config.displacementTexture),
       diffuseTexPath(config.diffuseTexPath),
       metallicTexPath(config.metallicTexPath),
       normalTexPath(config.normalTexPath),
       bumpTexPath(config.bumpTexPath),
       roughnessTexPath(config.roughnessTexPath),
+      displacementTexPath(config.displacementTexPath),
       roughnessTexIsGloss(config.roughnessTexIsGloss),
       bumpScale(config.bumpScale),
       roughness(config.roughness),
+      roughnessVariation(config.roughnessVariation),
+      displacementScale(config.displacementScale),
       shadowTransmission(config.shadowTransmission),
       shadowTint(config.shadowTint)
 {
@@ -108,7 +112,19 @@ float Material::getRoughnessAt(double u, double v, float lod) const
         if (roughnessTexIsGloss) tex = 1.0f - tex;
         out *= tex;
     }
+    if (roughnessVariation > 0.0f) {
+        float hash = std::fmod(std::fabs(static_cast<float>(u) * 127.1f +
+                                          static_cast<float>(v) * 311.7f) * 43758.5453f, 1.0f);
+        out += (hash - 0.5f) * roughnessVariation;
+    }
     return clamp(0.04f, 1.0f, out);
+}
+
+float Material::getDisplacementAt(double u, double v) const
+{
+    if (!displacementTexture || !displacementTexture->valid()) return 0.0f;
+    float h = displacementTexture->sampleScalar(static_cast<float>(u), static_cast<float>(v));
+    return (h - 0.5f) * 2.0f;
 }
 
 Vector3f Material::applyNormalMap(double u, double v,

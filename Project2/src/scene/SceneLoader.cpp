@@ -82,6 +82,9 @@ struct MaterialOverrideSpec {
     std::optional<float>        bumpScale;
     std::optional<float>        shadowTransmission;
     std::optional<Vector3f>     shadowTint;
+    std::optional<float>        roughnessVariation;
+    std::optional<std::string>  displacementTex;
+    std::optional<float>        displacementScale;
 };
 
 struct MaterialMapConfig {
@@ -242,7 +245,9 @@ private:
             else if (f == "denoiseSigmaColor") d.denoiseSigmaColor = parseNum();
             else if (f == "denoiseSigmaNormal") d.denoiseSigmaNormal = parseNum();
             else if (f == "denoiseSigmaAlbedo") d.denoiseSigmaAlbedo = parseNum();
-            else if (f == "bg")      d.background = parseV3();
+            else if (f == "bg")       d.background = parseV3();
+            else if (f == "exposure") d.exposure = parseNum();
+            else if (f == "toneMap")  d.toneMap = parseBool();
             else errorAt("unknown render field: " + f);
         }
     }
@@ -297,6 +302,9 @@ private:
             else if (f == "bumpScale")    m.bumpScale    = parseNum();
             else if (f == "shadowTransmission") m.shadowTransmission = parseNum();
             else if (f == "shadowTint")         m.shadowTint = parseV3();
+            else if (f == "roughnessVariation") m.roughnessVariation = parseNum();
+            else if (f == "displacementTex")    m.displacementTex = parseStr();
+            else if (f == "displacementScale")  m.displacementScale = parseNum();
             else errorAt("unknown mesh field: " + f);
         }
         d.meshes.push_back(std::move(m));
@@ -429,6 +437,9 @@ private:
             else if (f == "bumpScale")           spec.bumpScale = parseNum();
             else if (f == "shadowTransmission")  spec.shadowTransmission = parseNum();
             else if (f == "shadowTint")          spec.shadowTint = parseV3();
+            else if (f == "roughnessVariation")  spec.roughnessVariation = parseNum();
+            else if (f == "displacementTex")     spec.displacementTex = parseStr();
+            else if (f == "displacementScale")   spec.displacementScale = parseNum();
             else errorAt("unknown mtl field: " + f);
         }
         cfg.overrides[materialName] = std::move(spec);
@@ -639,6 +650,8 @@ LoadedScene SceneLoader::load(const std::string& sceneDir,
     scene->denoiseSigmaColor = std::max(0.001f, desc.denoiseSigmaColor);
     scene->denoiseSigmaNormal = std::max(0.001f, desc.denoiseSigmaNormal);
     scene->denoiseSigmaAlbedo = std::max(0.001f, desc.denoiseSigmaAlbedo);
+    scene->exposure       = std::max(0.0f, desc.exposure);
+    scene->toneMap        = desc.toneMap;
     scene->backgroundColor = desc.background;
     scene->outputBaseName  = "output/" + viewName;
 
@@ -790,6 +803,35 @@ LoadedScene SceneLoader::load(const std::string& sceneDir,
                 config.roughnessTexIsGloss = true;
             }
 
+            config.roughnessVariation = meshSpec.roughnessVariation.value_or(
+                override && override->roughnessVariation ? *override->roughnessVariation : 0.0f);
+
+            if (meshSpec.displacementTex) {
+                config.displacementTexPath = resolveRelative(sceneRoot, *meshSpec.displacementTex).string();
+            } else if (override && override->displacementTex) {
+                config.displacementTexPath = resolveRelative(materialMap.sourceDir, *override->displacementTex).string();
+            }
+            config.displacementScale = meshSpec.displacementScale.value_or(
+                override && override->displacementScale ? *override->displacementScale : 0.0f);
+
+            // Warn on implausibly bright albedo (walls/ceilings rarely exceed 0.9).
+            // Skip textured materials — color=(1,1,1) is the correct neutral
+            // multiplier when a diffuse map provides the actual albedo.
+            if (materialType != "EMIT" && materialType != "GLASS" &&
+                materialType != "MIRROR" && config.diffuseTexPath.empty()) {
+                float maxCh = std::max(config.color.x, std::max(config.color.y, config.color.z));
+                if (maxCh > 0.92f) {
+                    std::cerr << "SceneLoader: WARN material \""
+                              << (srcMaterial ? srcMaterial->name : "(unnamed)")
+                              << "\" albedo is very bright (" << config.color.x
+                              << " " << config.color.y << " " << config.color.z
+                              << "), clamping to 0.9 for physical plausibility.\n";
+                    config.color.x = std::min(config.color.x, 0.9f);
+                    config.color.y = std::min(config.color.y, 0.9f);
+                    config.color.z = std::min(config.color.z, 0.9f);
+                }
+            }
+
             if (!config.diffuseTexPath.empty()) {
                 if (Texture* tex = loadTextureCached(config.diffuseTexPath)) {
                     config.diffuseTexture = tex;
@@ -833,6 +875,15 @@ LoadedScene SceneLoader::load(const std::string& sceneDir,
                 } else {
                     std::cerr << "SceneLoader: WARN failed to load roughness texture \""
                               << config.roughnessTexPath << "\" for " << meshSpec.objPath << "\n";
+                }
+            }
+
+            if (!config.displacementTexPath.empty()) {
+                if (Texture* tex = loadTextureCached(config.displacementTexPath)) {
+                    config.displacementTexture = tex;
+                } else {
+                    std::cerr << "SceneLoader: WARN failed to load displacement texture \""
+                              << config.displacementTexPath << "\" for " << meshSpec.objPath << "\n";
                 }
             }
 

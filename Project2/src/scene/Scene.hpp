@@ -32,6 +32,8 @@ public:
     float    denoiseSigmaColor = 0.15f;
     float    denoiseSigmaNormal = 0.2f;
     float    denoiseSigmaAlbedo = 0.25f;
+    float    exposure = 1.0f;
+    bool     toneMap = true;
     std::string outputBaseName = "render";
 
     // PDF user-control requirement (iv): shadow toggle. When false the

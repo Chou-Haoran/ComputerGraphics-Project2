@@ -20,6 +20,23 @@ float luminance(const Vector3f& c)
     return 0.2126f * c.x + 0.7152f * c.y + 0.0722f * c.z;
 }
 
+Vector3f acesToneMap(const Vector3f& color)
+{
+    // Narkowicz ACES filmic fit — maps HDR linear radiance to [0,1] LDR
+    // with a contrast-preserving S-curve that avoids highlight clipping.
+    const float a = 2.51f;
+    const float b = 0.03f;
+    const float c = 2.43f;
+    const float d = 0.59f;
+    const float e = 0.14f;
+
+    auto curve = [&](float x) -> float {
+        return (x * (a * x + b)) / (x * (c * x + d) + e);
+    };
+
+    return Vector3f(curve(color.x), curve(color.y), curve(color.z));
+}
+
 Vector3f primarySurfaceNormal(const Scene& scene, const Ray& ray, const Intersection& inter)
 {
     Vector3f N = normalize(inter.normal);
@@ -157,6 +174,13 @@ void Renderer::Render(const Scene& scene, const Camera& camera)
     float avgSpp = static_cast<float>(totalSamples.load(std::memory_order_relaxed)) /
                    static_cast<float>(std::max(1, scene.width * scene.height));
     std::cout << "Average spp: " << avgSpp << "\n";
+
+    if (scene.toneMap && scene.exposure > 0.0f) {
+        std::cout << "Tone mapping: ACES filmic (exposure=" << scene.exposure << ")\n";
+        for (auto& pixel : framebuffer) {
+            pixel = acesToneMap(pixel * scene.exposure);
+        }
+    }
 
     const std::string ppmPath = scene.outputBaseName + ".ppm";
     const std::string pngPath = scene.outputBaseName + ".png";

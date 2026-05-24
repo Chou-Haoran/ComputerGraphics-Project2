@@ -1,0 +1,312 @@
+# Split essential scene — rebalanced lighting variant.
+#
+# 运行方式：
+#   ./build/Project2Renderer assets/models/the_blender_scene the_blender_scene_split_essential_rebalanced 1200x600 64
+
+render {
+    width                = 1200
+    height               = 600
+    spp                  = 64
+    depth                = 8
+    shadows              = true
+    adaptiveSampling     = true
+    adaptiveMinSpp       = 16
+    adaptiveBatch        = 8
+    adaptiveThreshold    = 0.08
+    exposure             = 1.2
+    toneMap              = true
+    denoise              = true
+    denoiseRadius        = 3
+    denoiseSigmaSpatial  = 2.0
+    denoiseSigmaColor    = 0.15
+    denoiseSigmaNormal   = 0.2
+    denoiseSigmaAlbedo   = 0.25
+    bg                   = 0.005 0.005 0.008
+}
+
+camera {
+    pos       = -0.490 1.220 1.652
+    lookAt    = 2.423 0.950 0.388
+    up        = 0.021 0.999 -0.034
+    fov       = 68
+    aperture  = 0.0
+    focus     = 3.18
+}
+
+envmap "../../envmaps/typewriter_studio_soft.hdr" {
+    intensity = 0.10
+    rotationY = 0.0
+}
+
+mesh "split_objs/Player01.obj" {
+    materialMap = "split_materialmaps/Player01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Book2.obj" {
+    materialMap = "split_materialmaps/Book2.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Book3.obj" {
+    materialMap = "split_materialmaps/Book3.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Book1.obj" {
+    materialMap = "split_materialmaps/Book1.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Carbinet01.obj" {
+    materialMap = "split_materialmaps/Carbinet01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Carpet01.obj" {
+    materialMap = "split_materialmaps/Carpet01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Chair01.obj" {
+    materialMap = "split_materialmaps/Chair01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Curtain01.obj" {
+    materialMap = "split_materialmaps/Curtain01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Desk.obj" {
+    materialMap = "split_materialmaps/Desk.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Floor01.obj" {
+    materialMap = "split_materialmaps/Floor01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Frame01.obj" {
+    materialMap = "split_materialmaps/Frame01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Globe01.obj" {
+    materialMap = "split_materialmaps/Globe01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Lamp01.obj" {
+    materialMap = "split_materialmaps/Lamp01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Lamp02.obj" {
+    materialMap = "split_materialmaps/Lamp02.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Lampshade01.obj" {
+    materialMap = "split_materialmaps/Lampshade01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Phone01.obj" {
+    materialMap = "split_materialmaps/Phone01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Pole02.obj" {
+    materialMap = "split_materialmaps/Pole02.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Radio01.obj" {
+    materialMap = "split_materialmaps/Radio01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Wall01.obj" {
+    materialMap = "split_materialmaps/Wall01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Wall03.obj" {
+    materialMap = "split_materialmaps/Wall03.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Floor02.obj" {
+    materialMap = "split_materialmaps/Floor02.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Floor03.obj" {
+    materialMap = "split_materialmaps/Floor03.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Floor06.obj" {
+    materialMap = "split_materialmaps/Floor06.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Floor07.obj" {
+    materialMap = "split_materialmaps/Floor07.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Floor08.obj" {
+    materialMap = "split_materialmaps/Floor08.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Wall05.obj" {
+    materialMap = "split_materialmaps/Wall05.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Wall06.obj" {
+    materialMap = "split_materialmaps/Wall06.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Wall07.obj" {
+    materialMap = "split_materialmaps/Wall07.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Curtain02.obj" {
+    materialMap = "split_materialmaps/Curtain02.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Carbinet02.obj" {
+    materialMap = "split_materialmaps/Carbinet02.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Carbinet03.obj" {
+    materialMap = "split_materialmaps/Carbinet03.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Chair02.obj" {
+    materialMap = "split_materialmaps/Chair02.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Pole01.obj" {
+    materialMap = "split_materialmaps/Pole01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Floor10.obj" {
+    materialMap = "split_materialmaps/Floor10.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Floor11.obj" {
+    materialMap = "split_materialmaps/Floor11.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+mesh "split_objs/Floor12.obj" {
+    materialMap = "split_materialmaps/Floor12.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+# ---- Window area lights (cool daylight from outside) ----
+light {
+    type      = AREA_RECT
+    pos       = 3.080 0.140 1.450
+    normal    = -1.000 0.000 0.000
+    size      = 0.850 0.560 0.000
+    emission  = 0.620 0.760 1.000
+    intensity = 0.35
+    enabled   = true
+}
+light {
+    type      = AREA_RECT
+    pos       = 3.080 2.140 1.450
+    normal    = -1.000 0.000 0.000
+    size      = 0.850 0.560 0.000
+    emission  = 0.620 0.760 1.000
+    intensity = 0.35
+    enabled   = true
+}
+
+# ---- Ceiling pendant warm lights (reduced from 5 to 3) ----
+light {
+    type      = AREA_SPHERE
+    pos       = 0.370 2.572 -0.040
+    radius    = 0.120
+    emission  = 1.000 0.823 0.533
+    intensity = 80.0
+    enabled   = true
+}
+light {
+    type      = AREA_SPHERE
+    pos       = 0.369 2.572 -0.921
+    radius    = 0.120
+    emission  = 1.000 0.752 0.450
+    intensity = 80.0
+    enabled   = true
+}
+light {
+    type      = AREA_SPHERE
+    pos       = -0.416 2.572 -0.471
+    radius    = 0.120
+    emission  = 1.000 0.773 0.354
+    intensity = 80.0
+    enabled   = true
+}
+
+# ---- Desk lamp (warm accent on tabletop) ----
+light {
+    type      = AREA_SPHERE
+    pos       = 2.384 1.491 1.412
+    radius    = 0.120
+    emission  = 1.000 0.731 0.389
+    intensity = 60.0
+    enabled   = true
+}

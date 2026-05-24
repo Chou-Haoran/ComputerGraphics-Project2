@@ -154,6 +154,67 @@ public:
     }
 };
 
+// Subdivide a triangle at midpoints and displace new vertices along
+// their interpolated normals by the material displacement height map.
+inline void subdivideAndDisplace(const Triangle& tri, const Material* mat,
+                                  std::vector<Triangle>& out,
+                                  Vector3f& min_vert, Vector3f& max_vert)
+{
+    const float dScale = mat ? mat->displacementScale : 0.0f;
+    if (!mat || !mat->displacementTexture || !mat->displacementTexture->valid() ||
+        dScale <= 0.0f) {
+        out.push_back(tri);
+        return;
+    }
+
+    Vector3f v0 = tri.v0, v1 = tri.v1, v2 = tri.v2;
+    Vector3f n0 = tri.n0, n1 = tri.n1, n2 = tri.n2;
+    Vector2f t0 = tri.t0, t1 = tri.t1, t2 = tri.t2;
+
+    Vector3f m01 = (v0 + v1) * 0.5f;
+    Vector3f m12 = (v1 + v2) * 0.5f;
+    Vector3f m20 = (v2 + v0) * 0.5f;
+
+    Vector3f nm01 = normalize(n0 + n1);
+    Vector3f nm12 = normalize(n1 + n2);
+    Vector3f nm20 = normalize(n2 + n0);
+
+    Vector2f tm01 = (t0 + t1) * 0.5f;
+    Vector2f tm12 = (t1 + t2) * 0.5f;
+    Vector2f tm20 = (t2 + t0) * 0.5f;
+
+    auto disp = [&](Vector3f& p, const Vector3f& n, const Vector2f& uv) {
+        float h = mat->getDisplacementAt(uv.x, uv.y);
+        p = p + n * (h * dScale);
+    };
+    disp(m01, nm01, tm01);
+    disp(m12, nm12, tm12);
+    disp(m20, nm20, tm20);
+
+    auto addTri = [&](const Vector3f& a, const Vector3f& b, const Vector3f& c,
+                       const Vector3f& na, const Vector3f& nb, const Vector3f& nc,
+                       const Vector2f& ta, const Vector2f& tb, const Vector2f& tc) {
+        Triangle nt(a, b, c, const_cast<Material*>(mat));
+        nt.n0 = na; nt.n1 = nb; nt.n2 = nc;
+        nt.t0 = ta; nt.t1 = tb; nt.t2 = tc;
+        for (int j = 0; j < 3; ++j) {
+            const Vector3f& vv = (&a)[j];
+            min_vert = Vector3f(std::min(min_vert.x, vv.x),
+                                std::min(min_vert.y, vv.y),
+                                std::min(min_vert.z, vv.z));
+            max_vert = Vector3f(std::max(max_vert.x, vv.x),
+                                std::max(max_vert.y, vv.y),
+                                std::max(max_vert.z, vv.z));
+        }
+        out.push_back(std::move(nt));
+    };
+
+    addTri(v0, m01, m20, n0, nm01, nm20, t0, tm01, tm20);
+    addTri(v1, m12, m01, n1, nm12, nm01, t1, tm12, tm01);
+    addTri(v2, m20, m12, n2, nm20, nm12, t2, tm20, tm12);
+    addTri(m01, m12, m20, nm01, nm12, nm20, tm01, tm12, tm20);
+}
+
 class MeshTriangle : public Object
 {
 public:
@@ -387,26 +448,38 @@ private:
                                         std::max(max_vert.z, vert.z));
                 }
 
-                triangles.emplace_back(face_vertices[0], face_vertices[1],
-                                       face_vertices[2], meshMaterial);
-                triangles.back().t0 = Vector2f(mesh.Vertices[face_indices[0]].TextureCoordinate.X,
-                                               mesh.Vertices[face_indices[0]].TextureCoordinate.Y);
-                triangles.back().t1 = Vector2f(mesh.Vertices[face_indices[1]].TextureCoordinate.X,
-                                               mesh.Vertices[face_indices[1]].TextureCoordinate.Y);
-                triangles.back().t2 = Vector2f(mesh.Vertices[face_indices[2]].TextureCoordinate.X,
-                                               mesh.Vertices[face_indices[2]].TextureCoordinate.Y);
-                triangles.back().n0 = transformNormal(Vector3f(mesh.Vertices[face_indices[0]].Normal.X,
-                                                               mesh.Vertices[face_indices[0]].Normal.Y,
-                                                               mesh.Vertices[face_indices[0]].Normal.Z),
-                                                      scale, rotation);
-                triangles.back().n1 = transformNormal(Vector3f(mesh.Vertices[face_indices[1]].Normal.X,
-                                                               mesh.Vertices[face_indices[1]].Normal.Y,
-                                                               mesh.Vertices[face_indices[1]].Normal.Z),
-                                                      scale, rotation);
-                triangles.back().n2 = transformNormal(Vector3f(mesh.Vertices[face_indices[2]].Normal.X,
-                                                               mesh.Vertices[face_indices[2]].Normal.Y,
-                                                               mesh.Vertices[face_indices[2]].Normal.Z),
-                                                      scale, rotation);
+                Triangle baseTri(face_vertices[0], face_vertices[1],
+                                 face_vertices[2], meshMaterial);
+                baseTri.t0 = Vector2f(mesh.Vertices[face_indices[0]].TextureCoordinate.X,
+                                      mesh.Vertices[face_indices[0]].TextureCoordinate.Y);
+                baseTri.t1 = Vector2f(mesh.Vertices[face_indices[1]].TextureCoordinate.X,
+                                      mesh.Vertices[face_indices[1]].TextureCoordinate.Y);
+                baseTri.t2 = Vector2f(mesh.Vertices[face_indices[2]].TextureCoordinate.X,
+                                      mesh.Vertices[face_indices[2]].TextureCoordinate.Y);
+                baseTri.n0 = transformNormal(Vector3f(mesh.Vertices[face_indices[0]].Normal.X,
+                                                      mesh.Vertices[face_indices[0]].Normal.Y,
+                                                      mesh.Vertices[face_indices[0]].Normal.Z),
+                                             scale, rotation);
+                baseTri.n1 = transformNormal(Vector3f(mesh.Vertices[face_indices[1]].Normal.X,
+                                                      mesh.Vertices[face_indices[1]].Normal.Y,
+                                                      mesh.Vertices[face_indices[1]].Normal.Z),
+                                             scale, rotation);
+                baseTri.n2 = transformNormal(Vector3f(mesh.Vertices[face_indices[2]].Normal.X,
+                                                      mesh.Vertices[face_indices[2]].Normal.Y,
+                                                      mesh.Vertices[face_indices[2]].Normal.Z),
+                                             scale, rotation);
+
+                bool hasDisp = meshMaterial &&
+                    meshMaterial->displacementTexture &&
+                    meshMaterial->displacementTexture->valid() &&
+                    meshMaterial->displacementScale > 0.0f;
+
+                if (hasDisp) {
+                    subdivideAndDisplace(baseTri, meshMaterial, triangles,
+                                         min_vert, max_vert);
+                } else {
+                    triangles.push_back(baseTri);
+                }
             }
         }
 

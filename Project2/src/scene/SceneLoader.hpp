@@ -38,6 +38,9 @@ struct MeshSpec {
     std::optional<float>       bumpScale;
     std::optional<float>       shadowTransmission;
     std::optional<Vector3f>    shadowTint;
+    std::optional<float>       roughnessVariation;
+    std::optional<std::string> displacementTex;
+    std::optional<float>       displacementScale;
 };
 
 struct CameraSpec {
@@ -73,6 +76,8 @@ struct SceneDescriptor {
     float    denoiseSigmaColor = 0.15f;
     float    denoiseSigmaNormal = 0.2f;
     float    denoiseSigmaAlbedo = 0.25f;
+    float    exposure = 1.0f;
+    bool     toneMap = false;
     Vector3f background = {0.0f, 0.0f, 0.0f};
 };
 

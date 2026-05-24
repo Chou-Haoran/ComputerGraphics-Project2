@@ -39,14 +39,18 @@ struct MaterialConfig {
     const Texture* normalTexture = nullptr;
     const Texture* bumpTexture = nullptr;
     const Texture* roughnessTexture = nullptr;
+    const Texture* displacementTexture = nullptr;
     std::string diffuseTexPath;
     std::string metallicTexPath;
     std::string normalTexPath;
     std::string bumpTexPath;
     std::string roughnessTexPath;
+    std::string displacementTexPath;
     bool roughnessTexIsGloss = false;
     float bumpScale = 0.05f;
     float roughness = 0.5f;
+    float roughnessVariation = 0.0f;
+    float displacementScale = 0.0f;
     float shadowTransmission = 0.0f;
     Vector3f shadowTint = Vector3f(1.0f);
 };
@@ -75,6 +79,7 @@ public:
                                    int maxSamples = 8) const;
     float    getMetallicAt(double u, double v, float lod = 0.0f) const;
     float    getRoughnessAt(double u, double v, float lod = 0.0f) const;
+    float    getDisplacementAt(double u, double v) const;
     Vector3f applyNormalMap(double u, double v,
                             const Vector3f& N,
                             const Vector3f& T,
@@ -97,14 +102,18 @@ public:
     const Texture* normalTexture;
     const Texture* bumpTexture;
     const Texture* roughnessTexture;
+    const Texture* displacementTexture;
     std::string diffuseTexPath;
     std::string metallicTexPath;
     std::string normalTexPath;
     std::string bumpTexPath;
     std::string roughnessTexPath;
+    std::string displacementTexPath;
     bool roughnessTexIsGloss;
     float bumpScale;
     float roughness;
+    float roughnessVariation;
+    float displacementScale;
     float shadowTransmission;
     Vector3f shadowTint;
 
