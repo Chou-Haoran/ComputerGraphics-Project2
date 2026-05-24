@@ -72,6 +72,8 @@ mtl "Gass" {
     ior = 1.45
     roughness = 0.06
     Ks = 0.02
+    shadowTransmission = 0.92
+    shadowTint = 0.92 0.96 1.00
     diffuseTex = "../textures/T_Glass_01_A.tga.png"
     roughnessTex = "../textures/T_Glass_01_R.tga.png"
     roughnessTexIsGloss = true
@@ -94,4 +96,3 @@ mtl "Prop03" {
     bumpTex = "../textures/T_Props_03_N.tga.png"
     bumpScale = 0.0
 }
-

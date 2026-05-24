@@ -981,8 +981,6 @@ LoadedScene SceneLoader::load(const std::string& sceneDir,
         }
     }
 
-    scene->buildBVH();
-
     // ---- camera ------------------------------------------------------------
     float aspect = static_cast<float>(desc.width) / static_cast<float>(desc.height);
     auto cam = std::make_unique<Camera>(
@@ -995,6 +993,8 @@ LoadedScene SceneLoader::load(const std::string& sceneDir,
         desc.camera.focusDist
     );
     scene->camera = cam.get();
+    scene->buildBVH();
+    scene->buildPrimaryRayAccel();
 
     // ---- environment map ---------------------------------------------------
     if (!desc.envmapPath.empty()) {

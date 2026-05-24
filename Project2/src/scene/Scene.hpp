@@ -52,14 +52,18 @@ public:
 
     const std::vector<Object*>& get_objects() const { return objects; }
     Intersection intersect(const Ray& ray) const;
+    Intersection intersectPrimary(const Ray& ray) const;
     BVHAccel* bvh = nullptr;
     void buildBVH();
+    void buildPrimaryRayAccel();
     Vector3f castRay(const Ray& ray, int depth) const;
     void sampleLight(Intersection& pos, float& pdf) const;
     int sampleAnalyticLight(float u, float& pickPdf) const;
 
     std::vector<Object*> objects;
+    std::vector<Object*> primaryRayObjects;
     std::vector<std::unique_ptr<Light>> analyticLights;
     std::vector<float> analyticLightCdf;
     float analyticLightWeightSum = 0.0f;
+    BVHAccel* primaryBvh = nullptr;
 };

@@ -48,7 +48,7 @@ Denoiser::GuideBuffers buildGuideBuffers(const Scene& scene, const Camera& camer
             float u = (static_cast<float>(i) + 0.5f) / static_cast<float>(scene.width);
             float v = (static_cast<float>(j) + 0.5f) / static_cast<float>(scene.height);
             Ray ray = camera.generateRay(u, v, 0.5f, 0.5f);
-            Intersection inter = scene.intersect(ray);
+            Intersection inter = scene.intersectPrimary(ray);
             if (!inter.happened || inter.material == nullptr || inter.obj == nullptr) {
                 continue;
             }

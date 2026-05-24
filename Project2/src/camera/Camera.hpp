@@ -26,6 +26,10 @@ public:
 
     Vector3f position() const { return origin; }
     float    fov()      const { return fovDegrees; }
+    float    aspect()   const { return aspectRatio; }
+    Vector3f forwardDir() const { return forward; }
+    Vector3f rightDir()   const { return right; }
+    Vector3f upVector()   const { return upDir; }
 
 private:
     Vector3f origin;

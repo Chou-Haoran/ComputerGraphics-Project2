@@ -1,0 +1,28 @@
+{
+  "source_scene": "the_blender_scene_table_close_split.scene",
+  "camera_scene": "the_blender_scene_table_close.scene",
+  "selected_object_count": 21,
+  "selected_objects": [
+    "Book2",
+    "Book3",
+    "Book1",
+    "Carpet01",
+    "Chair01",
+    "Curtain01",
+    "Desk",
+    "Floor01",
+    "Frame01",
+    "Globe01",
+    "Lamp01",
+    "Lampshade01",
+    "Phone01",
+    "Wall01",
+    "Wall03",
+    "Floor02",
+    "Floor08",
+    "Wall05",
+    "Wall06",
+    "Curtain02",
+    "Chair02"
+  ]
+}

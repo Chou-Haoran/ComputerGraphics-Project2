@@ -32,6 +32,8 @@ mtl "Lampshade" {
     color = 1.00 1.00 1.00
     roughness = 0.82
     Ks = 0.05
+    shadowTransmission = 0.18
+    shadowTint = 1.00 0.88 0.70
     diffuseTex = "../textures/T_Lampshade_01_A.tga.png"
     roughnessTex = "../textures/T_Lampshade_01_R.tga.png"
     roughnessTexIsGloss = true
@@ -39,4 +41,3 @@ mtl "Lampshade" {
     bumpTex = "../textures/T_Lampshade_01_N.tga.png"
     bumpScale = 0.0
 }
-

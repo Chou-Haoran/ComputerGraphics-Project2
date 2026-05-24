@@ -14,6 +14,44 @@ struct TextureFootprint {
     float lod = 0.0f;
 };
 
+bool aabbInsidePlane(const Bounds3& bounds, const Vector3f& planeNormal, const Vector3f& planePoint)
+{
+    const Vector3f center = (bounds.pMin + bounds.pMax) * 0.5f;
+    const Vector3f extent = (bounds.pMax - bounds.pMin) * 0.5f;
+    const float radius = extent.x * std::fabs(planeNormal.x) +
+                         extent.y * std::fabs(planeNormal.y) +
+                         extent.z * std::fabs(planeNormal.z);
+    const float signedDistance = dotProduct(planeNormal, center - planePoint);
+    return signedDistance + radius >= 0.0f;
+}
+
+bool intersectsPrimaryFrustum(const Scene& scene, const Object* object)
+{
+    if (!scene.camera || !object) return true;
+
+    const Bounds3 bounds = const_cast<Object*>(object)->getBounds();
+    const Vector3f origin = scene.camera->position();
+    const Vector3f forward = normalize(scene.camera->forwardDir());
+    const Vector3f right = normalize(scene.camera->rightDir());
+    const Vector3f up = normalize(scene.camera->upVector());
+
+    const float tanHalfY = std::tan(0.5f * deg2rad(scene.camera->fov()));
+    const float tanHalfX = tanHalfY * scene.camera->aspect();
+
+    const Vector3f nearPoint = origin + forward * 0.02f;
+    if (!aabbInsidePlane(bounds, forward, nearPoint)) return false;
+
+    const Vector3f leftPlaneNormal = normalize(forward * tanHalfX + right);
+    const Vector3f rightPlaneNormal = normalize(forward * tanHalfX - right);
+    const Vector3f bottomPlaneNormal = normalize(forward * tanHalfY + up);
+    const Vector3f topPlaneNormal = normalize(forward * tanHalfY - up);
+
+    return aabbInsidePlane(bounds, leftPlaneNormal, origin) &&
+           aabbInsidePlane(bounds, rightPlaneNormal, origin) &&
+           aabbInsidePlane(bounds, bottomPlaneNormal, origin) &&
+           aabbInsidePlane(bounds, topPlaneNormal, origin);
+}
+
 Vector3f offsetRayOrigin(const Vector3f& point, const Vector3f& normal, const Vector3f& dir)
 {
     return dotProduct(dir, normal) < 0 ? point - normal * EPSILON
@@ -137,12 +175,51 @@ void Scene::buildBVH() {
     bvh = new BVHAccel(objects, 1, BVHAccel::SplitMethod::NAIVE);
 }
 
+void Scene::buildPrimaryRayAccel()
+{
+    primaryRayObjects.clear();
+    primaryBvh = nullptr;
+    if (objects.empty()) return;
+
+    for (auto* object : objects) {
+        if (intersectsPrimaryFrustum(*this, object)) {
+            primaryRayObjects.push_back(object);
+        }
+    }
+
+    if (primaryRayObjects.empty()) {
+        primaryRayObjects = objects;
+    }
+
+    printf(" - Primary-ray culling keeps %zu / %zu objects.\n",
+           primaryRayObjects.size(), objects.size());
+
+    if (!ENABLE_BVH || primaryRayObjects.size() <= 1) return;
+    primaryBvh = new BVHAccel(primaryRayObjects, 1, BVHAccel::SplitMethod::NAIVE);
+}
+
 Intersection Scene::intersect(const Ray& ray) const
 {
     if (ENABLE_BVH && bvh) return bvh->Intersect(ray);
 
     Intersection closest;
     for (auto* obj : objects) {
+        Intersection hit = obj->getIntersection(ray);
+        if (hit.happened && hit.tnear < closest.tnear) closest = hit;
+    }
+    return closest;
+}
+
+Intersection Scene::intersectPrimary(const Ray& ray) const
+{
+    if (primaryRayObjects.empty()) {
+        return intersect(ray);
+    }
+
+    if (ENABLE_BVH && primaryBvh) return primaryBvh->Intersect(ray);
+
+    Intersection closest;
+    for (auto* obj : primaryRayObjects) {
         Intersection hit = obj->getIntersection(ray);
         if (hit.happened && hit.tnear < closest.tnear) closest = hit;
     }
@@ -197,7 +274,7 @@ int Scene::sampleAnalyticLight(float u, float& pickPdf) const
 // with Fresnel-weighted reflection/refraction.
 Vector3f Scene::castRay(const Ray& ray, int depth) const
 {
-    auto inter = intersect(ray);
+    auto inter = depth == 0 ? intersectPrimary(ray) : intersect(ray);
 
     if (!inter.happened) {
         // PDF user-control (vi): environment map for the miss path.

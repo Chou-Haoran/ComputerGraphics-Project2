@@ -32,6 +32,8 @@ mtl "Curtain" {
     color = 1.00 1.00 1.00
     roughness = 0.88
     Ks = 0.03
+    shadowTransmission = 0.22
+    shadowTint = 0.78 0.72 0.62
     diffuseTex = "../textures/T_Curtain_01_A.tga.png"
     roughnessTex = "../textures/T_Curtain_01_R.jpg"
     roughnessTexIsGloss = true
@@ -39,4 +41,3 @@ mtl "Curtain" {
     bumpTex = "../textures/T_Curtain_01_N.tga.png"
     bumpScale = 0.0
 }
-
