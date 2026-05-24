@@ -1,0 +1,211 @@
+{
+  "groups": {
+    "room_shell": {
+      "members": [
+        "Floor01",
+        "Floor02",
+        "Floor03",
+        "Floor04",
+        "Floor05",
+        "Floor06",
+        "Floor07",
+        "Floor08",
+        "Floor09",
+        "Floor10",
+        "Floor11",
+        "Floor12",
+        "Floor13",
+        "Floor14",
+        "Floor15",
+        "Floor16",
+        "Floor17",
+        "Floor18",
+        "Wall01",
+        "Wall02",
+        "Wall03",
+        "Wall04",
+        "Wall05",
+        "Wall06",
+        "Wall07",
+        "Wall08",
+        "Wall09"
+      ],
+      "materials": [
+        "Floor",
+        "Ceiling",
+        "Wall",
+        "Gass",
+        "Prop03"
+      ],
+      "faces": 77056,
+      "object_count": 27,
+      "obj": "grouped_objs/room_shell.obj",
+      "materialmap": "grouped_materialmaps/room_shell.materialmap"
+    },
+    "curtains_and_poles": {
+      "members": [
+        "Curtain01",
+        "Curtain02",
+        "Pole01",
+        "Pole02"
+      ],
+      "materials": [
+        "Curtain",
+        "Prop03"
+      ],
+      "faces": 173224,
+      "object_count": 4,
+      "obj": "grouped_objs/curtains_and_poles.obj",
+      "materialmap": "grouped_materialmaps/curtains_and_poles.materialmap"
+    },
+    "desk_structure": {
+      "members": [
+        "Desk",
+        "Carbinet01",
+        "Carbinet02",
+        "Carbinet03"
+      ],
+      "materials": [
+        "Prop01",
+        "Prop02"
+      ],
+      "faces": 112627,
+      "object_count": 4,
+      "obj": "grouped_objs/desk_structure.obj",
+      "materialmap": "grouped_materialmaps/desk_structure.materialmap"
+    },
+    "chairs_and_carpet": {
+      "members": [
+        "Chair01",
+        "Chair02",
+        "Carpet01"
+      ],
+      "materials": [
+        "Prop01",
+        "Prop02"
+      ],
+      "faces": 84354,
+      "object_count": 3,
+      "obj": "grouped_objs/chairs_and_carpet.obj",
+      "materialmap": "grouped_materialmaps/chairs_and_carpet.materialmap"
+    },
+    "books_and_frames": {
+      "members": [
+        "Book1",
+        "Book2",
+        "Book3",
+        "Frame01",
+        "Frame02",
+        "Frame03"
+      ],
+      "materials": [
+        "Prop01",
+        "Prop02",
+        "Prop03"
+      ],
+      "faces": 16092,
+      "object_count": 6,
+      "obj": "grouped_objs/books_and_frames.obj",
+      "materialmap": "grouped_materialmaps/books_and_frames.materialmap"
+    },
+    "tabletop_devices": {
+      "members": [
+        "Player01",
+        "Clock",
+        "Globe01",
+        "Phone01",
+        "Radio01",
+        "TV01"
+      ],
+      "materials": [
+        "Prop01",
+        "Prop02",
+        "Gass"
+      ],
+      "faces": 204167,
+      "object_count": 6,
+      "obj": "grouped_objs/tabletop_devices.obj",
+      "materialmap": "grouped_materialmaps/tabletop_devices.materialmap"
+    },
+    "lamps": {
+      "members": [
+        "Lamp01",
+        "Lamp02",
+        "Lampshade01"
+      ],
+      "materials": [
+        "Prop01",
+        "Prop03",
+        "Gass",
+        "Lampshade"
+      ],
+      "faces": 170296,
+      "object_count": 3,
+      "obj": "grouped_objs/lamps.obj",
+      "materialmap": "grouped_materialmaps/lamps.materialmap"
+    },
+    "accent_machine": {
+      "members": [
+        "Neri",
+        "Targa",
+        "Logo"
+      ],
+      "materials": [
+        "Royal_typewriter_Plastic",
+        "Metal_Chrome",
+        "Royal_typewriter_Rubber",
+        "Royal_typewriter_Buttons",
+        "Royal_typewriter_Metal_black",
+        "Royal_typewriter_Measure",
+        "Royal_typewriter_Tape",
+        "Royal_typewriter_Paper",
+        "Material_#51",
+        "Royal_typewriter_Label"
+      ],
+      "faces": 14563,
+      "object_count": 3,
+      "obj": "grouped_objs/accent_machine.obj",
+      "materialmap": "grouped_materialmaps/accent_machine.materialmap"
+    }
+  },
+  "scene_variants": {
+    "the_blender_scene_grouped.scene": {
+      "source": "wide_full",
+      "groups": [
+        "room_shell",
+        "curtains_and_poles",
+        "desk_structure",
+        "chairs_and_carpet",
+        "books_and_frames",
+        "tabletop_devices",
+        "lamps",
+        "accent_machine"
+      ]
+    },
+    "the_blender_scene_table_close_grouped.scene": {
+      "source": "closeup_full",
+      "groups": [
+        "room_shell",
+        "curtains_and_poles",
+        "desk_structure",
+        "chairs_and_carpet",
+        "books_and_frames",
+        "tabletop_devices",
+        "lamps",
+        "accent_machine"
+      ]
+    },
+    "the_blender_scene_table_close_essential.scene": {
+      "source": "closeup_full",
+      "groups": [
+        "room_shell",
+        "curtains_and_poles",
+        "desk_structure",
+        "books_and_frames",
+        "tabletop_devices",
+        "lamps"
+      ]
+    }
+  },
+  "missing_material_blocks": {}
+}

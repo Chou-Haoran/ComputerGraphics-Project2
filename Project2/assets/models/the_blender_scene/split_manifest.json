@@ -1,0 +1,530 @@
+{
+  "source_obj": "blender.obj",
+  "object_count": 56,
+  "objects": [
+    {
+      "name": "Player01",
+      "obj": "split_objs/Player01.obj",
+      "materialmap": "split_materialmaps/Player01.materialmap",
+      "materials": [
+        "Prop01"
+      ],
+      "faces": 57060
+    },
+    {
+      "name": "Book2",
+      "obj": "split_objs/Book2.obj",
+      "materialmap": "split_materialmaps/Book2.materialmap",
+      "materials": [
+        "Prop01"
+      ],
+      "faces": 3332
+    },
+    {
+      "name": "Book3",
+      "obj": "split_objs/Book3.obj",
+      "materialmap": "split_materialmaps/Book3.materialmap",
+      "materials": [
+        "Prop01"
+      ],
+      "faces": 3332
+    },
+    {
+      "name": "Book1",
+      "obj": "split_objs/Book1.obj",
+      "materialmap": "split_materialmaps/Book1.materialmap",
+      "materials": [
+        "Prop01"
+      ],
+      "faces": 3332
+    },
+    {
+      "name": "Carbinet01",
+      "obj": "split_objs/Carbinet01.obj",
+      "materialmap": "split_materialmaps/Carbinet01.materialmap",
+      "materials": [
+        "Prop02"
+      ],
+      "faces": 17144
+    },
+    {
+      "name": "Carpet01",
+      "obj": "split_objs/Carpet01.obj",
+      "materialmap": "split_materialmaps/Carpet01.materialmap",
+      "materials": [
+        "Prop02"
+      ],
+      "faces": 12712
+    },
+    {
+      "name": "Chair01",
+      "obj": "split_objs/Chair01.obj",
+      "materialmap": "split_materialmaps/Chair01.materialmap",
+      "materials": [
+        "Prop01"
+      ],
+      "faces": 35821
+    },
+    {
+      "name": "Curtain01",
+      "obj": "split_objs/Curtain01.obj",
+      "materialmap": "split_materialmaps/Curtain01.materialmap",
+      "materials": [
+        "Curtain"
+      ],
+      "faces": 80852
+    },
+    {
+      "name": "Clock",
+      "obj": "split_objs/Clock.obj",
+      "materialmap": "split_materialmaps/Clock.materialmap",
+      "materials": [
+        "Prop02",
+        "Gass"
+      ],
+      "faces": 34578
+    },
+    {
+      "name": "Desk",
+      "obj": "split_objs/Desk.obj",
+      "materialmap": "split_materialmaps/Desk.materialmap",
+      "materials": [
+        "Prop01"
+      ],
+      "faces": 61195
+    },
+    {
+      "name": "Floor01",
+      "obj": "split_objs/Floor01.obj",
+      "materialmap": "split_materialmaps/Floor01.materialmap",
+      "materials": [
+        "Floor"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Frame01",
+      "obj": "split_objs/Frame01.obj",
+      "materialmap": "split_materialmaps/Frame01.materialmap",
+      "materials": [
+        "Prop01"
+      ],
+      "faces": 2672
+    },
+    {
+      "name": "Frame02",
+      "obj": "split_objs/Frame02.obj",
+      "materialmap": "split_materialmaps/Frame02.materialmap",
+      "materials": [
+        "Prop02",
+        "Prop03"
+      ],
+      "faces": 1880
+    },
+    {
+      "name": "Frame03",
+      "obj": "split_objs/Frame03.obj",
+      "materialmap": "split_materialmaps/Frame03.materialmap",
+      "materials": [
+        "Prop02",
+        "Prop03"
+      ],
+      "faces": 1544
+    },
+    {
+      "name": "Globe01",
+      "obj": "split_objs/Globe01.obj",
+      "materialmap": "split_materialmaps/Globe01.materialmap",
+      "materials": [
+        "Prop01"
+      ],
+      "faces": 7280
+    },
+    {
+      "name": "Lamp01",
+      "obj": "split_objs/Lamp01.obj",
+      "materialmap": "split_materialmaps/Lamp01.materialmap",
+      "materials": [
+        "Prop01"
+      ],
+      "faces": 5828
+    },
+    {
+      "name": "Lamp02",
+      "obj": "split_objs/Lamp02.obj",
+      "materialmap": "split_materialmaps/Lamp02.materialmap",
+      "materials": [
+        "Prop03",
+        "Gass"
+      ],
+      "faces": 141044
+    },
+    {
+      "name": "Lampshade01",
+      "obj": "split_objs/Lampshade01.obj",
+      "materialmap": "split_materialmaps/Lampshade01.materialmap",
+      "materials": [
+        "Lampshade"
+      ],
+      "faces": 23424
+    },
+    {
+      "name": "Phone01",
+      "obj": "split_objs/Phone01.obj",
+      "materialmap": "split_materialmaps/Phone01.materialmap",
+      "materials": [
+        "Prop01"
+      ],
+      "faces": 50730
+    },
+    {
+      "name": "Pole02",
+      "obj": "split_objs/Pole02.obj",
+      "materialmap": "split_materialmaps/Pole02.materialmap",
+      "materials": [
+        "Prop03"
+      ],
+      "faces": 5760
+    },
+    {
+      "name": "Radio01",
+      "obj": "split_objs/Radio01.obj",
+      "materialmap": "split_materialmaps/Radio01.materialmap",
+      "materials": [
+        "Prop01",
+        "Gass"
+      ],
+      "faces": 26271
+    },
+    {
+      "name": "TV01",
+      "obj": "split_objs/TV01.obj",
+      "materialmap": "split_materialmaps/TV01.materialmap",
+      "materials": [
+        "Prop01"
+      ],
+      "faces": 28248
+    },
+    {
+      "name": "Wall01",
+      "obj": "split_objs/Wall01.obj",
+      "materialmap": "split_materialmaps/Wall01.materialmap",
+      "materials": [
+        "Wall"
+      ],
+      "faces": 7234
+    },
+    {
+      "name": "Wall02",
+      "obj": "split_objs/Wall02.obj",
+      "materialmap": "split_materialmaps/Wall02.materialmap",
+      "materials": [
+        "Wall"
+      ],
+      "faces": 3675
+    },
+    {
+      "name": "Wall03",
+      "obj": "split_objs/Wall03.obj",
+      "materialmap": "split_materialmaps/Wall03.materialmap",
+      "materials": [
+        "Wall",
+        "Gass"
+      ],
+      "faces": 14482
+    },
+    {
+      "name": "Wall04",
+      "obj": "split_objs/Wall04.obj",
+      "materialmap": "split_materialmaps/Wall04.materialmap",
+      "materials": [
+        "Wall",
+        "Prop03"
+      ],
+      "faces": 14501
+    },
+    {
+      "name": "Floor02",
+      "obj": "split_objs/Floor02.obj",
+      "materialmap": "split_materialmaps/Floor02.materialmap",
+      "materials": [
+        "Floor"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Floor03",
+      "obj": "split_objs/Floor03.obj",
+      "materialmap": "split_materialmaps/Floor03.materialmap",
+      "materials": [
+        "Floor"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Floor04",
+      "obj": "split_objs/Floor04.obj",
+      "materialmap": "split_materialmaps/Floor04.materialmap",
+      "materials": [
+        "Floor"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Floor05",
+      "obj": "split_objs/Floor05.obj",
+      "materialmap": "split_materialmaps/Floor05.materialmap",
+      "materials": [
+        "Floor"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Floor06",
+      "obj": "split_objs/Floor06.obj",
+      "materialmap": "split_materialmaps/Floor06.materialmap",
+      "materials": [
+        "Floor"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Floor07",
+      "obj": "split_objs/Floor07.obj",
+      "materialmap": "split_materialmaps/Floor07.materialmap",
+      "materials": [
+        "Floor"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Floor08",
+      "obj": "split_objs/Floor08.obj",
+      "materialmap": "split_materialmaps/Floor08.materialmap",
+      "materials": [
+        "Floor"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Floor09",
+      "obj": "split_objs/Floor09.obj",
+      "materialmap": "split_materialmaps/Floor09.materialmap",
+      "materials": [
+        "Floor"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Wall05",
+      "obj": "split_objs/Wall05.obj",
+      "materialmap": "split_materialmaps/Wall05.materialmap",
+      "materials": [
+        "Wall",
+        "Gass"
+      ],
+      "faces": 14482
+    },
+    {
+      "name": "Wall06",
+      "obj": "split_objs/Wall06.obj",
+      "materialmap": "split_materialmaps/Wall06.materialmap",
+      "materials": [
+        "Wall"
+      ],
+      "faces": 3675
+    },
+    {
+      "name": "Wall07",
+      "obj": "split_objs/Wall07.obj",
+      "materialmap": "split_materialmaps/Wall07.materialmap",
+      "materials": [
+        "Wall"
+      ],
+      "faces": 7234
+    },
+    {
+      "name": "Wall08",
+      "obj": "split_objs/Wall08.obj",
+      "materialmap": "split_materialmaps/Wall08.materialmap",
+      "materials": [
+        "Wall"
+      ],
+      "faces": 3675
+    },
+    {
+      "name": "Wall09",
+      "obj": "split_objs/Wall09.obj",
+      "materialmap": "split_materialmaps/Wall09.materialmap",
+      "materials": [
+        "Wall"
+      ],
+      "faces": 7234
+    },
+    {
+      "name": "Curtain02",
+      "obj": "split_objs/Curtain02.obj",
+      "materialmap": "split_materialmaps/Curtain02.materialmap",
+      "materials": [
+        "Curtain"
+      ],
+      "faces": 80852
+    },
+    {
+      "name": "Carbinet02",
+      "obj": "split_objs/Carbinet02.obj",
+      "materialmap": "split_materialmaps/Carbinet02.materialmap",
+      "materials": [
+        "Prop02"
+      ],
+      "faces": 17144
+    },
+    {
+      "name": "Carbinet03",
+      "obj": "split_objs/Carbinet03.obj",
+      "materialmap": "split_materialmaps/Carbinet03.materialmap",
+      "materials": [
+        "Prop02"
+      ],
+      "faces": 17144
+    },
+    {
+      "name": "Chair02",
+      "obj": "split_objs/Chair02.obj",
+      "materialmap": "split_materialmaps/Chair02.materialmap",
+      "materials": [
+        "Prop01"
+      ],
+      "faces": 35821
+    },
+    {
+      "name": "Pole01",
+      "obj": "split_objs/Pole01.obj",
+      "materialmap": "split_materialmaps/Pole01.materialmap",
+      "materials": [
+        "Prop03"
+      ],
+      "faces": 5760
+    },
+    {
+      "name": "Floor10",
+      "obj": "split_objs/Floor10.obj",
+      "materialmap": "split_materialmaps/Floor10.materialmap",
+      "materials": [
+        "Ceiling"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Floor11",
+      "obj": "split_objs/Floor11.obj",
+      "materialmap": "split_materialmaps/Floor11.materialmap",
+      "materials": [
+        "Ceiling"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Floor12",
+      "obj": "split_objs/Floor12.obj",
+      "materialmap": "split_materialmaps/Floor12.materialmap",
+      "materials": [
+        "Ceiling"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Floor13",
+      "obj": "split_objs/Floor13.obj",
+      "materialmap": "split_materialmaps/Floor13.materialmap",
+      "materials": [
+        "Ceiling"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Floor14",
+      "obj": "split_objs/Floor14.obj",
+      "materialmap": "split_materialmaps/Floor14.materialmap",
+      "materials": [
+        "Ceiling"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Floor15",
+      "obj": "split_objs/Floor15.obj",
+      "materialmap": "split_materialmaps/Floor15.materialmap",
+      "materials": [
+        "Ceiling"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Floor16",
+      "obj": "split_objs/Floor16.obj",
+      "materialmap": "split_materialmaps/Floor16.materialmap",
+      "materials": [
+        "Ceiling"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Floor17",
+      "obj": "split_objs/Floor17.obj",
+      "materialmap": "split_materialmaps/Floor17.materialmap",
+      "materials": [
+        "Ceiling"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Floor18",
+      "obj": "split_objs/Floor18.obj",
+      "materialmap": "split_materialmaps/Floor18.materialmap",
+      "materials": [
+        "Ceiling"
+      ],
+      "faces": 48
+    },
+    {
+      "name": "Neri",
+      "obj": "split_objs/Neri.obj",
+      "materialmap": "split_materialmaps/Neri.materialmap",
+      "materials": [
+        "Royal_typewriter_Plastic",
+        "Metal_Chrome",
+        "Royal_typewriter_Rubber",
+        "Royal_typewriter_Buttons",
+        "Royal_typewriter_Metal_black",
+        "Royal_typewriter_Measure",
+        "Royal_typewriter_Tape",
+        "Royal_typewriter_Paper"
+      ],
+      "faces": 14056
+    },
+    {
+      "name": "Targa",
+      "obj": "split_objs/Targa.obj",
+      "materialmap": "split_materialmaps/Targa.materialmap",
+      "materials": [
+        "Material_#51"
+      ],
+      "faces": 480
+    },
+    {
+      "name": "Logo",
+      "obj": "split_objs/Logo.obj",
+      "materialmap": "split_materialmaps/Logo.materialmap",
+      "materials": [
+        "Royal_typewriter_Label"
+      ],
+      "faces": 27
+    }
+  ],
+  "split_scenes": [
+    "the_blender_scene_split.scene",
+    "the_blender_scene_table_close_split.scene"
+  ],
+  "missing_material_blocks": {}
+}

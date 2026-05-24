@@ -1,0 +1,73 @@
+# 基于 scene_export.json 的 Blender 材质重建版。
+# 说明：
+# - 保留 Blender 导出的贴图连接和基础参数。
+# - 对当前渲染器不稳定的部分做兼容修正：保留原资产的 gloss 贴图语义，
+#   同时继续使用更稳的材质类型分配，避免大面积材质发黑或发灰。
+
+materialMap {
+    defaultType = MICROFACET
+    defaultRoughnessMin = 0.16
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+mtl "Prop01" {
+    type = MICROFACET
+    color = 1.00 1.00 1.00
+    metallic = 1.0
+    roughness = 0.34
+    Ks = 0.18
+    diffuseTex = "../textures/T_Props_01_A.tga.png"
+    metallicTex = "../textures/T_Props_01_M.tga.png"
+    roughnessTex = "../textures/T_Props_01_R.tga.png"
+    roughnessTexIsGloss = true
+    normalTex = "../textures/T_Props_01_N.tga.png"
+    bumpTex = "../textures/T_Props_01_N.tga.png"
+    bumpScale = 0.0
+}
+
+mtl "Prop02" {
+    type = MICROFACET
+    color = 1.00 1.00 1.00
+    metallic = 1.0
+    roughness = 0.30
+    Ks = 0.20
+    diffuseTex = "../textures/T_Props_02_A.tga.png"
+    metallicTex = "../textures/T_Props_02_M.tga.png"
+    roughnessTex = "../textures/T_Props_02_R.tga.png"
+    roughnessTexIsGloss = true
+    normalTex = "../textures/T_Props_02_N.tga.png"
+    bumpTex = "../textures/T_Props_02_N.tga.png"
+    bumpScale = 0.0
+}
+
+mtl "Gass" {
+    type = GLASS
+    color = 0.96 0.97 1.00
+    ior = 1.45
+    roughness = 0.06
+    Ks = 0.02
+    diffuseTex = "../textures/T_Glass_01_A.tga.png"
+    roughnessTex = "../textures/T_Glass_01_R.tga.png"
+    roughnessTexIsGloss = true
+    normalTex = "../textures/T_Glass_01_N.tga.png"
+    bumpTex = "../textures/T_Glass_01_N.tga.png"
+    bumpScale = 0.0
+}
+
