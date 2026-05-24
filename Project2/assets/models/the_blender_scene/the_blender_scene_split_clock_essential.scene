@@ -1,0 +1,283 @@
+# Blender 导出的复古房间 split 场景，机位保持不变并改为看向座钟。
+#
+# 运行方式：
+#   ./build/Project2Renderer assets/models/the_blender_scene the_blender_scene_split_clock 960x720 64
+
+render {
+    width                = 1200
+    height               = 600
+    spp                  = 64
+    depth                = 8
+    shadows              = true
+    adaptiveSampling     = true
+    adaptiveMinSpp       = 16
+    adaptiveBatch        = 8
+    adaptiveThreshold    = 0.08
+    denoise              = true
+    denoiseRadius        = 3
+    denoiseSigmaSpatial  = 2.0
+    denoiseSigmaColor    = 0.15
+    denoiseSigmaNormal   = 0.2
+    denoiseSigmaAlbedo   = 0.25
+    bg                   = 0.005 0.005 0.008
+}
+
+camera {
+    # 保持 split 场景当前机位，但把视线改为指向座钟中心。
+    pos       = -0.490 1.220 1.652
+    lookAt    = -2.516392 1.062718 -2.399191
+    up        = 0.021 0.999 -0.034
+    fov       = 68
+    aperture  = 0.0
+    focus     = 4.532455
+}
+
+envmap "../../envmaps/typewriter_studio_soft.hdr" {
+    intensity = 0.020
+    rotationY = 0.0
+}
+
+mesh "split_objs/Player01.obj" {
+    materialMap = "split_materialmaps/Player01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Carbinet01.obj" {
+    materialMap = "split_materialmaps/Carbinet01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Carpet01.obj" {
+    materialMap = "split_materialmaps/Carpet01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Clock.obj" {
+    materialMap = "split_materialmaps/Clock.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Frame02.obj" {
+    materialMap = "split_materialmaps/Frame02.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Frame03.obj" {
+    materialMap = "split_materialmaps/Frame03.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Lamp02.obj" {
+    materialMap = "split_materialmaps/Lamp02.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/TV01.obj" {
+    materialMap = "split_materialmaps/TV01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Wall01.obj" {
+    materialMap = "split_materialmaps/Wall01.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Wall02.obj" {
+    materialMap = "split_materialmaps/Wall02.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Floor04.obj" {
+    materialMap = "split_materialmaps/Floor04.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Floor05.obj" {
+    materialMap = "split_materialmaps/Floor05.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Floor06.obj" {
+    materialMap = "split_materialmaps/Floor06.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Floor07.obj" {
+    materialMap = "split_materialmaps/Floor07.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Floor08.obj" {
+    materialMap = "split_materialmaps/Floor08.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Floor09.obj" {
+    materialMap = "split_materialmaps/Floor09.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Wall08.obj" {
+    materialMap = "split_materialmaps/Wall08.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Wall09.obj" {
+    materialMap = "split_materialmaps/Wall09.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Floor12.obj" {
+    materialMap = "split_materialmaps/Floor12.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Floor13.obj" {
+    materialMap = "split_materialmaps/Floor13.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Floor16.obj" {
+    materialMap = "split_materialmaps/Floor16.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+mesh "split_objs/Floor17.obj" {
+    materialMap = "split_materialmaps/Floor17.materialmap"
+    offset      = 0.0 0.0 0.0
+    rotation    = 0.0 0.0 0.0
+    scale       = 1.0 1.0 1.0
+}
+
+light {
+    type      = AREA_RECT
+    pos       = 3.080 0.140 1.450
+    normal    = -1.000 0.000 0.000
+    size      = 0.850 0.560 0.000
+    emission  = 0.620 0.760 1.000
+    intensity = 0.28
+    enabled   = true
+}
+
+light {
+    type      = AREA_RECT
+    pos       = 3.080 2.140 1.450
+    normal    = -1.000 0.000 0.000
+    size      = 0.850 0.560 0.000
+    emission  = 0.620 0.760 1.000
+    intensity = 0.28
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = 0.370 2.572 -0.040
+    radius    = 0.120
+    emission  = 1.000 0.823 0.533
+    intensity = 120.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = 0.629 2.572 -0.492
+    radius    = 0.120
+    emission  = 1.000 0.778 0.485
+    intensity = 120.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = 0.369 2.572 -0.921
+    radius    = 0.120
+    emission  = 1.000 0.752 0.450
+    intensity = 120.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = -0.160 2.572 -0.942
+    radius    = 0.110
+    emission  = 1.000 0.731 0.389
+    intensity = 145.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = -0.416 2.572 -0.471
+    radius    = 0.120
+    emission  = 1.000 0.773 0.354
+    intensity = 120.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = 2.384 1.491 1.412
+    radius    = 0.120
+    emission  = 1.000 0.731 0.389
+    intensity = 46.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = 2.373 1.520 1.410
+    radius    = 0.045
+    emission  = 1.000 0.900 0.700
+    intensity = 260.0
+    enabled   = true
+}
+
+light {
+    type      = DIRECTIONAL
+    dir       = -0.623 -0.613 0.485
+    emission  = 1.000 0.929 0.849
+    intensity = 3.8
+    enabled   = true
+}

@@ -1,0 +1,29 @@
+{
+  "source_scene": "the_blender_scene_split_clock.scene",
+  "camera_scene": "the_blender_scene_split_clock.scene",
+  "selected_object_count": 22,
+  "selected_objects": [
+    "Player01",
+    "Carbinet01",
+    "Carpet01",
+    "Clock",
+    "Frame02",
+    "Frame03",
+    "Lamp02",
+    "TV01",
+    "Wall01",
+    "Wall02",
+    "Floor04",
+    "Floor05",
+    "Floor06",
+    "Floor07",
+    "Floor08",
+    "Floor09",
+    "Wall08",
+    "Wall09",
+    "Floor12",
+    "Floor13",
+    "Floor16",
+    "Floor17"
+  ]
+}

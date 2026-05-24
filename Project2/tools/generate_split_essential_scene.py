@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import math
 import re
@@ -9,11 +10,7 @@ from pathlib import Path
 
 
 SCENE_DIR = Path("assets/models/the_blender_scene")
-SOURCE_SCENE = SCENE_DIR / "the_blender_scene_table_close_split.scene"
-SOURCE_CAMERA_SCENE = SCENE_DIR / "the_blender_scene_table_close.scene"
 SPLIT_MANIFEST = SCENE_DIR / "split_manifest.json"
-OUT_SCENE = SCENE_DIR / "the_blender_scene_table_close_split_essential.scene"
-OUT_MANIFEST = SCENE_DIR / "the_blender_scene_table_close_split_essential_manifest.json"
 
 ENV_BLOCK = """envmap "../../envmaps/typewriter_studio_soft.hdr" {
     intensity = 0.020
@@ -148,8 +145,13 @@ def normalize(a):
     return tuple(x / n for x in a)
 
 
-def parse_camera():
-    text = SOURCE_CAMERA_SCENE.read_text(encoding="utf-8")
+def parse_scene_spec(scene_path: Path):
+    text = scene_path.read_text(encoding="utf-8")
+    render_match = re.search(
+        r"render \{.*?width\s*=\s*(\d+).*?height\s*=\s*(\d+)",
+        text,
+        re.S,
+    )
     match = re.search(
         r"camera \{.*?pos\s*=\s*([-\d.]+)\s+([-\d.]+)\s+([-\d.]+).*?"
         r"lookAt\s*=\s*([-\d.]+)\s+([-\d.]+)\s+([-\d.]+).*?"
@@ -160,12 +162,16 @@ def parse_camera():
     )
     if not match:
         raise RuntimeError("camera block not found")
+    if not render_match:
+        raise RuntimeError("render block not found")
     vals = list(map(float, match.groups()))
+    width, height = map(float, render_match.groups())
     return {
         "pos": tuple(vals[:3]),
         "lookAt": tuple(vals[3:6]),
         "up": tuple(vals[6:9]),
         "fov": vals[9],
+        "aspect": width / height,
     }
 
 
@@ -191,8 +197,8 @@ def inside_plane(bounds, normal, point):
     return signed_distance + radius >= 0.0
 
 
-def compute_visible_objects():
-    camera = parse_camera()
+def compute_visible_objects(camera_scene: Path):
+    camera = parse_scene_spec(camera_scene)
     pos = camera["pos"]
     look_at = camera["lookAt"]
     up = camera["up"]
@@ -202,7 +208,7 @@ def compute_visible_objects():
     right = normalize(cross(forward, up))
     up_dir = cross(right, forward)
 
-    aspect = 1200.0 / 600.0
+    aspect = camera["aspect"]
     tan_half_y = math.tan(math.radians(fov) * 0.5)
     tan_half_x = tan_half_y * aspect
 
@@ -279,9 +285,42 @@ def find_camera_block_end(lines):
     raise RuntimeError("camera block not found")
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Generate an essential split-scene variant by keeping only frustum-visible objects."
+    )
+    parser.add_argument(
+        "--source-scene",
+        default="the_blender_scene_table_close_split.scene",
+        help="Split scene to trim (relative to assets/models/the_blender_scene).",
+    )
+    parser.add_argument(
+        "--camera-scene",
+        default="the_blender_scene_table_close.scene",
+        help="Scene whose camera/render block defines visibility (relative to assets/models/the_blender_scene).",
+    )
+    parser.add_argument(
+        "--out-scene",
+        default="the_blender_scene_table_close_split_essential.scene",
+        help="Output scene filename (relative to assets/models/the_blender_scene).",
+    )
+    parser.add_argument(
+        "--out-manifest",
+        default="the_blender_scene_table_close_split_essential_manifest.json",
+        help="Output manifest filename (relative to assets/models/the_blender_scene).",
+    )
+    return parser.parse_args()
+
+
 def main():
-    visible = compute_visible_objects()
-    lines = SOURCE_SCENE.read_text(encoding="utf-8").splitlines(keepends=True)
+    args = parse_args()
+    source_scene = SCENE_DIR / args.source_scene
+    camera_scene = SCENE_DIR / args.camera_scene
+    out_scene = SCENE_DIR / args.out_scene
+    out_manifest = SCENE_DIR / args.out_manifest
+
+    visible = compute_visible_objects(camera_scene)
+    lines = source_scene.read_text(encoding="utf-8").splitlines(keepends=True)
     mesh_blocks = extract_mesh_blocks(lines)
 
     selected_blocks = []
@@ -307,12 +346,12 @@ def main():
         new_lines.append("\n")
     new_lines.append(LIGHT_BLOCK)
 
-    OUT_SCENE.write_text("".join(new_lines), encoding="utf-8")
-    OUT_MANIFEST.write_text(
+    out_scene.write_text("".join(new_lines), encoding="utf-8")
+    out_manifest.write_text(
         json.dumps(
             {
-                "source_scene": SOURCE_SCENE.name,
-                "camera_scene": SOURCE_CAMERA_SCENE.name,
+                "source_scene": source_scene.name,
+                "camera_scene": camera_scene.name,
                 "selected_object_count": len(selected_names),
                 "selected_objects": selected_names,
             },
@@ -323,7 +362,7 @@ def main():
         encoding="utf-8",
     )
 
-    print(f"Wrote {OUT_SCENE.name} with {len(selected_names)} objects.")
+    print(f"Wrote {out_scene.name} with {len(selected_names)} objects.")
     for name in selected_names:
         print(name)
 
