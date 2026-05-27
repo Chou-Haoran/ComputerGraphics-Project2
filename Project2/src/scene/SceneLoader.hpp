@@ -42,6 +42,10 @@ struct MeshSpec {
     std::optional<float>       roughnessVariation;
     std::optional<std::string> displacementTex;
     std::optional<float>       displacementScale;
+    // When true the OBJ's per-vertex normals are ignored and each triangle
+    // uses its geometric face normal. Gives crisp facet edges on gems and
+    // other hard-edge meshes that were exported with smoothing turned on.
+    bool                       flatNormals = false;
 };
 
 struct CameraSpec {

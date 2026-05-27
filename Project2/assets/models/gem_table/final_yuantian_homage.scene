@@ -42,6 +42,7 @@ mesh "diamond/diamond.obj" {
     color              = 1.000 1.000 1.000
     ior                = 2.42
     dispersion         = 0.025
+    flatNormals        = true
     shadowTransmission = 0.96
     shadowTint         = 1.000 1.000 1.000
     offset             = -0.040 0.0160 0.044
@@ -51,12 +52,12 @@ mesh "diamond/diamond.obj" {
 
 mesh "black_rock.obj" {
     material           = MICROFACET
-    color              = 0.060 0.065 0.072
-    roughness          = 0.88
-    roughnessVariation = 0.18
+    color              = 0.020 0.024 0.032
+    roughness          = 0.20
+    roughnessVariation = 0.08
     offset             = 0.040 0.000 0.044
     rotation           = -8.000 24.000 -12.000
-    scale              = 1.050 1.050 1.050
+    scale              = 1.120 1.120 1.120
 }
 
 light {

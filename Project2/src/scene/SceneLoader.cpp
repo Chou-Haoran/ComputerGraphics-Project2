@@ -307,6 +307,7 @@ private:
             else if (f == "roughnessVariation") m.roughnessVariation = parseNum();
             else if (f == "displacementTex")    m.displacementTex = parseStr();
             else if (f == "displacementScale")  m.displacementScale = parseNum();
+            else if (f == "flatNormals")        m.flatNormals = parseBool();
             else errorAt("unknown mesh field: " + f);
         }
         d.meshes.push_back(std::move(m));
@@ -909,7 +910,8 @@ LoadedScene SceneLoader::load(const std::string& sceneDir,
                                                    meshSpec.offset,
                                                    meshSpec.rotation,
                                                    meshSpec.scale,
-                                                   submeshMaterials);
+                                                   submeshMaterials,
+                                                   meshSpec.flatNormals);
         scene->Add(mesh.get());
         if (mesh->hasEmit()) {
             scene->AddLight(std::make_unique<MeshLight>(mesh.get()));

@@ -296,9 +296,10 @@ public:
                  Vector3f offset,
                  Vector3f rotation,
                  Vector3f scale,
-                 const std::vector<Material*>& meshMaterials)
+                 const std::vector<Material*>& meshMaterials,
+                 bool flatNormals = false)
     {
-        buildFromLoader(loader, offset, rotation, scale, meshMaterials);
+        buildFromLoader(loader, offset, rotation, scale, meshMaterials, flatNormals);
     }
 
 
@@ -405,7 +406,8 @@ private:
                          Vector3f offset,
                          Vector3f rotation,
                          Vector3f scale,
-                         const std::vector<Material*>& meshMaterials)
+                         const std::vector<Material*>& meshMaterials,
+                         bool flatNormals = false)
     {
         area = 0.0f;
         emissiveArea = 0.0f;
@@ -456,18 +458,23 @@ private:
                                       mesh.Vertices[face_indices[1]].TextureCoordinate.Y);
                 baseTri.t2 = Vector2f(mesh.Vertices[face_indices[2]].TextureCoordinate.X,
                                       mesh.Vertices[face_indices[2]].TextureCoordinate.Y);
-                baseTri.n0 = transformNormal(Vector3f(mesh.Vertices[face_indices[0]].Normal.X,
-                                                      mesh.Vertices[face_indices[0]].Normal.Y,
-                                                      mesh.Vertices[face_indices[0]].Normal.Z),
-                                             scale, rotation);
-                baseTri.n1 = transformNormal(Vector3f(mesh.Vertices[face_indices[1]].Normal.X,
-                                                      mesh.Vertices[face_indices[1]].Normal.Y,
-                                                      mesh.Vertices[face_indices[1]].Normal.Z),
-                                             scale, rotation);
-                baseTri.n2 = transformNormal(Vector3f(mesh.Vertices[face_indices[2]].Normal.X,
-                                                      mesh.Vertices[face_indices[2]].Normal.Y,
-                                                      mesh.Vertices[face_indices[2]].Normal.Z),
-                                             scale, rotation);
+                // flatNormals: leave Triangle's geometric face normal in place
+                // (set by its constructor) so smoothing-group exports don't
+                // round off the facet edges of gems, etc.
+                if (!flatNormals) {
+                    baseTri.n0 = transformNormal(Vector3f(mesh.Vertices[face_indices[0]].Normal.X,
+                                                          mesh.Vertices[face_indices[0]].Normal.Y,
+                                                          mesh.Vertices[face_indices[0]].Normal.Z),
+                                                 scale, rotation);
+                    baseTri.n1 = transformNormal(Vector3f(mesh.Vertices[face_indices[1]].Normal.X,
+                                                          mesh.Vertices[face_indices[1]].Normal.Y,
+                                                          mesh.Vertices[face_indices[1]].Normal.Z),
+                                                 scale, rotation);
+                    baseTri.n2 = transformNormal(Vector3f(mesh.Vertices[face_indices[2]].Normal.X,
+                                                          mesh.Vertices[face_indices[2]].Normal.Y,
+                                                          mesh.Vertices[face_indices[2]].Normal.Z),
+                                                 scale, rotation);
+                }
 
                 bool hasDisp = meshMaterial &&
                     meshMaterial->displacementTexture &&
