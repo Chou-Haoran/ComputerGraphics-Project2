@@ -2,10 +2,15 @@
 #include "Camera.hpp"
 #include "Denoiser.hpp"
 #include "ImageIO.hpp"
+#include "Light.hpp"
+#include "Material.hpp"
+#include "PhotonMap.hpp"
 #include "global.hpp"
+#include <algorithm>
 #include <atomic>
 #include <cmath>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -78,15 +83,245 @@ Denoiser::GuideBuffers buildGuideBuffers(const Scene& scene, const Camera& camer
     return guides;
 }
 
+Vector3f offsetOrigin(const Vector3f& point, const Vector3f& N, const Vector3f& dir)
+{
+    return dotProduct(dir, N) < 0.0f ? point - N * EPSILON
+                                      : point + N * EPSILON;
+}
+
+// Trace one photon through specular bounces and store it where it lands on
+// a non-delta surface. Caustic-only: we don't bounce off the diffuse hit
+// because the photon map only models LS+D paths.
+void tracePhoton(PhotonMap& map, const Scene& scene, Ray ray,
+                 Vector3f power, int specularDepth, int maxDepth)
+{
+    while (maxDepth-- > 0) {
+        Intersection hit = scene.intersect(ray);
+        if (!hit.happened || !hit.material) return;
+
+        Vector3f N = normalize(hit.normal);
+        MaterialInteraction mi = hit.material->resolveInteraction(
+            ray.direction, N, ray.spectralChannel);
+
+        if (mi.kind == MaterialInteractionKind::Emission) return;  // absorbed
+
+        if (mi.kind == MaterialInteractionKind::Delta) {
+            // Stochastically pick one bounce by throughput strength so we
+            // don't fan out exponentially (Russian-roulette style continuation).
+            float weights[4];
+            float total = 0.0f;
+            for (int i = 0; i < mi.bounceCount; ++i) {
+                const Vector3f& t = mi.bounces[i].throughput;
+                weights[i] = std::max({t.x, t.y, t.z, 0.0f});
+                total += weights[i];
+            }
+            if (total < 1e-6f) return;
+
+            float r = get_random_float() * total;
+            int chosen = mi.bounceCount - 1;
+            float acc = 0.0f;
+            for (int i = 0; i < mi.bounceCount; ++i) {
+                acc += weights[i];
+                if (r <= acc) { chosen = i; break; }
+            }
+            const MaterialDeltaBounce& b = mi.bounces[chosen];
+            // Adjust power for the importance sampling of bounces.
+            Vector3f stepThroughput = b.throughput * (total / std::max(weights[chosen], 1e-6f));
+            power = Vector3f(power.x * stepThroughput.x,
+                             power.y * stepThroughput.y,
+                             power.z * stepThroughput.z);
+            if (std::max({power.x, power.y, power.z}) < 1e-12f) return;
+
+            Vector3f newOrigin = offsetOrigin(hit.coords, N, b.direction);
+            ray = Ray(newOrigin, b.direction);
+            ray.spectralChannel = b.channel >= 0 ? b.channel : ray.spectralChannel;
+            ++specularDepth;
+            continue;
+        }
+
+        // Non-delta hit: deposit photon if it travelled through specular at
+        // least once, then stop (caustic-only photon map).
+        if (specularDepth > 0) {
+            Photon p;
+            p.position = hit.coords;
+            p.incoming = ray.direction;
+            p.power = power;
+            map.store(p);
+        }
+        return;
+    }
+}
+
+struct SpecularTarget {
+    Vector3f center;
+    float    radius = 0.0f;
+};
+
+// Collect bounding spheres for every GLASS/MIRROR mesh so photon emission can
+// importance-sample directions that actually have a chance to refract or
+// reflect into a useful path.
+std::vector<SpecularTarget> collectSpecularTargets(const Scene& scene)
+{
+    std::vector<SpecularTarget> out;
+    for (const Object* obj : scene.get_objects()) {
+        if (!obj) continue;
+        const Material* mat = obj->getMaterial();
+        if (!mat) continue;
+        const std::string& name = mat->typeName();
+        if (name != "GLASS" && name != "MIRROR") continue;
+        Bounds3 b = const_cast<Object*>(obj)->getBounds();
+        Vector3f center = (b.pMin + b.pMax) * 0.5f;
+        Vector3f extent = (b.pMax - b.pMin) * 0.5f;
+        float radius = extent.norm();   // bounding-sphere radius (over-estimates)
+        if (radius <= 0.0f) continue;
+        out.push_back({center, radius});
+    }
+    return out;
+}
+
+// Uniformly sample a direction inside the cone subtending `target` from
+// `origin`. Returns the world-space direction and writes the solid-angle
+// PDF to `outPdf`.
+Vector3f sampleConeToward(const Vector3f& origin,
+                          const SpecularTarget& target,
+                          float& outPdf)
+{
+    Vector3f toCenter = target.center - origin;
+    float d2 = dotProduct(toCenter, toCenter);
+    float d = std::sqrt(d2);
+
+    auto sampleUniformSphere = [](float& pdf) {
+        pdf = 1.0f / (4.0f * static_cast<float>(M_PI));
+        float u1 = get_random_float();
+        float u2 = get_random_float();
+        float z  = 1.0f - 2.0f * u1;
+        float rr = std::sqrt(std::max(0.0f, 1.0f - z * z));
+        float phi = 2.0f * static_cast<float>(M_PI) * u2;
+        return Vector3f(std::cos(phi) * rr, z, std::sin(phi) * rr);
+    };
+
+    if (d <= target.radius + EPSILON) {
+        return sampleUniformSphere(outPdf);   // origin already inside target
+    }
+
+    Vector3f axis = toCenter / d;
+    float sinAlphaMax = std::min(1.0f, target.radius / d);
+    float cosAlphaMax = std::sqrt(std::max(0.0f, 1.0f - sinAlphaMax * sinAlphaMax));
+
+    float u1 = get_random_float();
+    float u2 = get_random_float();
+    float cosAlpha = 1.0f - u1 * (1.0f - cosAlphaMax);
+    float sinAlpha = std::sqrt(std::max(0.0f, 1.0f - cosAlpha * cosAlpha));
+    float phi = 2.0f * static_cast<float>(M_PI) * u2;
+
+    Vector3f local(std::cos(phi) * sinAlpha,
+                   std::sin(phi) * sinAlpha,
+                   cosAlpha);
+
+    Vector3f tan = std::fabs(axis.y) > 0.999f
+                       ? Vector3f(1.0f, 0.0f, 0.0f)
+                       : normalize(crossProduct(Vector3f(0.0f, 1.0f, 0.0f), axis));
+    Vector3f bit = normalize(crossProduct(axis, tan));
+
+    outPdf = 1.0f / (2.0f * static_cast<float>(M_PI) * (1.0f - cosAlphaMax));
+    return normalize(tan * local.x + bit * local.y + axis * local.z);
+}
+
+std::unique_ptr<PhotonMap> buildCausticPhotonMap(const Scene& scene,
+                                                 int totalPhotons,
+                                                 float gatherRadius)
+{
+    auto map = std::make_unique<PhotonMap>();
+    if (totalPhotons <= 0 || scene.analyticLights.empty()) return map;
+
+    float totalWeight = 0.0f;
+    for (const auto& light : scene.analyticLights) {
+        if (light && light->enabled()) totalWeight += light->samplingWeight();
+    }
+    if (totalWeight <= 0.0f) return map;
+
+    const std::vector<SpecularTarget> targets = collectSpecularTargets(scene);
+    const bool useImportance = !targets.empty();
+
+    int emitted = 0;
+    int rejected = 0;
+    for (const auto& light : scene.analyticLights) {
+        if (!light || !light->enabled()) continue;
+        int nForLight = std::max(1, static_cast<int>(
+            std::round(totalPhotons * light->samplingWeight() / totalWeight)));
+
+        for (int i = 0; i < nForLight; ++i) {
+            Vector3f origin, dir, power;
+
+            if (useImportance) {
+                // Emission-point sampling, then pick a specular target
+                // uniformly and bias the direction into its subtended cone.
+                Vector3f lightNormal;
+                Vector3f radiance;
+                float area = 0.0f;
+                if (!light->sampleEmissionPoint(origin, lightNormal,
+                                                radiance, area)) {
+                    if (!light->samplePhoton(origin, dir, power, nForLight)) continue;
+                } else {
+                    const int targetIdx = static_cast<int>(
+                        std::floor(get_random_float() *
+                                   static_cast<float>(targets.size())));
+                    const SpecularTarget& tgt = targets[std::min(
+                        targetIdx, static_cast<int>(targets.size()) - 1)];
+                    float conePdf = 0.0f;
+                    dir = sampleConeToward(origin, tgt, conePdf);
+                    // Direction may face away from the light's emitting hemisphere
+                    // (Lambertian emitters only emit into +n half-space).
+                    float cosTheta = dotProduct(dir, lightNormal);
+                    if (cosTheta <= 0.0f || conePdf <= 0.0f) {
+                        ++rejected;
+                        continue;
+                    }
+                    // Per-photon flux for the chosen sampling distribution:
+                    //   L · area · cosθ · selectionProb⁻¹ · pdf⁻¹ / N
+                    float selectionInv = static_cast<float>(targets.size());
+                    float scale = (area * cosTheta * selectionInv) /
+                                  (conePdf * static_cast<float>(nForLight));
+                    power = radiance * scale;
+                }
+            } else if (!light->samplePhoton(origin, dir, power, nForLight)) {
+                continue;
+            }
+
+            tracePhoton(*map, scene, Ray(origin, dir), power, 0, 8);
+        }
+        emitted += nForLight;
+    }
+
+    map->build(2.0f * gatherRadius);
+    std::cout << "Caustic photon pass: emitted " << emitted
+              << ", rejected " << rejected
+              << ", stored " << map->size()
+              << " (importance-sampled toward " << targets.size()
+              << " specular target" << (targets.size() == 1 ? "" : "s")
+              << ")\n";
+    return map;
+}
+
 } // namespace
 
-void Renderer::Render(const Scene& scene, const Camera& camera)
+void Renderer::Render(Scene& scene, const Camera& camera)
 {
     std::vector<Vector3f> framebuffer(scene.width * scene.height);
 
     std::cout << "SPP: " << scene.spp << "\n";
     std::cout << "Adaptive sampling: "
               << (scene.adaptiveSamplingEnabled ? "on" : "off") << "\n";
+
+    // ---- caustic photon emission ------------------------------------------
+    std::unique_ptr<PhotonMap> photonMap;
+    if (scene.causticPhotonCount > 0) {
+        std::cout << "Caustic photons requested: " << scene.causticPhotonCount
+                  << " (gather radius " << scene.causticGatherRadius << ")\n";
+        photonMap = buildCausticPhotonMap(scene, scene.causticPhotonCount,
+                                          scene.causticGatherRadius);
+        scene.causticMap = photonMap.get();
+    }
 
     constexpr float fireflyClamp = 1.5f;
     std::atomic<uint32_t> rowsDone{0};

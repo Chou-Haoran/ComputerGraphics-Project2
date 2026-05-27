@@ -64,6 +64,50 @@ public:
         return std::max(static_cast<float>(M_PI) * area_ * luminance(emittedRadiance()), 1e-4f);
     }
 
+    bool samplePhoton(Vector3f& origin,
+                      Vector3f& direction,
+                      Vector3f& power,
+                      int totalForThisLight) const override
+    {
+        if (!enabled_ || totalForThisLight <= 0) return false;
+
+        const float sx = size_.x * (get_random_float() - 0.5f);
+        const float sz = size_.y * (get_random_float() - 0.5f);
+        origin = position_ + tangent_ * sx + bitangent_ * sz;
+
+        // Cosine-weighted hemisphere around the light's outward normal.
+        // (Lambertian emitter — matches our radiance-based `sampleLi`.)
+        float u1 = get_random_float();
+        float u2 = get_random_float();
+        float r  = std::sqrt(u1);
+        float phi = 2.0f * static_cast<float>(M_PI) * u2;
+        float lx = r * std::cos(phi);
+        float ly = r * std::sin(phi);
+        float lz = std::sqrt(std::max(0.0f, 1.0f - u1));
+        direction = normalize(tangent_ * lx + bitangent_ * ly + normal_ * lz);
+
+        // Total radiant flux of a Lambertian rect is Φ = π · L · A; with
+        // cosine-distributed photons the per-sample power is Φ / N.
+        const Vector3f Phi = emittedRadiance() * (static_cast<float>(M_PI) * area_);
+        power = Phi / static_cast<float>(totalForThisLight);
+        return true;
+    }
+
+    bool sampleEmissionPoint(Vector3f& origin,
+                             Vector3f& normal,
+                             Vector3f& emissionRadiance,
+                             float& area) const override
+    {
+        if (!enabled_) return false;
+        const float sx = size_.x * (get_random_float() - 0.5f);
+        const float sz = size_.y * (get_random_float() - 0.5f);
+        origin = position_ + tangent_ * sx + bitangent_ * sz;
+        normal = normal_;
+        emissionRadiance = emittedRadiance();
+        area = area_;
+        return true;
+    }
+
 private:
     Vector3f position_  = Vector3f(0.0f);
     Vector3f normal_    = Vector3f(0.0f, -1.0f, 0.0f);

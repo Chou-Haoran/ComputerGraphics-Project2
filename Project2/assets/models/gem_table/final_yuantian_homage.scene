@@ -20,6 +20,8 @@ render {
     denoiseSigmaColor = 0.10
     denoiseSigmaNormal = 0.10
     denoiseSigmaAlbedo = 0.12
+    causticPhotons       = 4000
+    causticGatherRadius  = 0.0005
 }
 
 camera {
@@ -33,7 +35,7 @@ camera {
 
 mesh "stage.obj" {
     material  = MICROFACET
-    color     = 0.860 0.868 0.895
+    color     = 0.420 0.430 0.460
     roughness = 0.92
 }
 

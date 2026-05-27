@@ -11,6 +11,8 @@
 #include "Ray.hpp"
 #include "Intersection.hpp"
 
+class Material;
+
 class Object
 {
 public:
@@ -23,6 +25,10 @@ public:
     virtual float getArea()=0;
     virtual void Sample(Intersection &pos, float &pdf)=0;
     virtual bool hasEmit()=0;
+    // Defaults to nullptr so non-shaded helpers don't need to implement it;
+    // mesh objects override to expose the material the photon-emission pass
+    // uses for importance-sampling toward specular targets.
+    virtual const Material* getMaterial() const { return nullptr; }
 };
 
 

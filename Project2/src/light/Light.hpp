@@ -35,6 +35,31 @@ public:
         return std::max(luminance(emittedRadiance()), 1e-4f);
     }
 
+    // Emit a single photon for caustic photon mapping. `totalForThisLight` is
+    // the number of photons drawn from this light over the whole pass, used
+    // to amortise the light's total radiant flux across the samples. Returns
+    // false for light types that don't support photon emission yet.
+    virtual bool samplePhoton(Vector3f& /*origin*/,
+                              Vector3f& /*direction*/,
+                              Vector3f& /*power*/,
+                              int /*totalForThisLight*/) const
+    {
+        return false;
+    }
+
+    // Sample only a point + outward normal on the light surface so the caller
+    // can choose its own direction sampling strategy (e.g. importance-sample
+    // toward a specular target). Also returns the constant Lambertian
+    // emission radiance and the surface area so callers can build photon
+    // power for arbitrary directional PDFs.
+    virtual bool sampleEmissionPoint(Vector3f& /*origin*/,
+                                     Vector3f& /*normal*/,
+                                     Vector3f& /*emissionRadiance*/,
+                                     float& /*area*/) const
+    {
+        return false;
+    }
+
 protected:
     Vector3f emittedRadiance() const { return emission_ * intensity_; }
     float luminance(const Vector3f& c) const

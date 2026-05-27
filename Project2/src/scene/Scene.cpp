@@ -1,6 +1,7 @@
 #include "Scene.hpp"
 #include "Camera.hpp"
 #include "Material.hpp"
+#include "PhotonMap.hpp"
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -407,6 +408,15 @@ Vector3f Scene::castRay(const Ray& ray, int depth, int* pathFlags) const
             Ray nextRay(offsetRayOrigin(hitPoint, N, sampleDir), sampleDir);
             nextRay.spectralChannel = ray.spectralChannel;
             Intersection nextInter = intersect(nextRay);
+            // Skip indirect contribution that immediately enters a specular
+            // surface when the caustic photon map is active — that LSDE
+            // energy is already supplied by the gather below.
+            const bool causticActive = causticMap != nullptr;
+            const bool nextIsSpecular = nextInter.happened && nextInter.material &&
+                (nextInter.material->typeName() == "GLASS" ||
+                 nextInter.material->typeName() == "MIRROR");
+            const bool dropForCaustic = causticActive && nextIsSpecular;
+
             if (!nextInter.happened) {
                 Vector3f missRadiance(0.0f);
                 if (envmap && envmap->valid()) {
@@ -425,7 +435,7 @@ Vector3f Scene::castRay(const Ray& ray, int depth, int* pathFlags) const
                     indirectLight = castRay(nextRay, depth + 1, pathFlags) *
                                     brdf * cosSample / (pdf * RussianRoulette);
                 }
-            } else if (!nextInter.material->hasEmission()) {
+            } else if (!nextInter.material->hasEmission() && !dropForCaustic) {
                 Vector3f brdf = inter.material->eval(viewDir, sampleDir, N,
                                                      surfaceCol, surfaceRoughness,
                                                      surfaceMetallic);
@@ -434,5 +444,17 @@ Vector3f Scene::castRay(const Ray& ray, int depth, int* pathFlags) const
             }
         }
     }
-    return directLight + indirectLight;
+
+    // Caustic gather: add the LSDE energy the photon-emission pass collected.
+    // We treat the receiving surface as Lambertian for the convolution
+    // (photons arrive from many directions; only the diffuse term is
+    // meaningful for an integrated gather). f_r = albedo / π.
+    Vector3f causticLight(0.0f);
+    if (causticMap && causticMap->size() > 0) {
+        Vector3f fluxDensity = causticMap->estimateFluxDensity(hitPoint, N,
+                                                                causticGatherRadius);
+        causticLight = fluxDensity * surfaceCol * (1.0f / static_cast<float>(M_PI));
+    }
+
+    return directLight + indirectLight + causticLight;
 }

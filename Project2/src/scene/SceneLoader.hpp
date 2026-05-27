@@ -84,6 +84,8 @@ struct SceneDescriptor {
     float    exposure = 1.0f;
     bool     toneMap = false;
     Vector3f background = {0.0f, 0.0f, 0.0f};
+    int      causticPhotons = 0;            // 0 disables caustic photon mapping
+    float    causticGatherRadius = 0.006f;  // photon-map lookup radius
 };
 
 // CLI / runtime knobs that win over the .scene file when set. Built by

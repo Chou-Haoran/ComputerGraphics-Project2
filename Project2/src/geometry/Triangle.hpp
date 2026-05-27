@@ -305,6 +305,8 @@ public:
 
     Bounds3 getBounds() { return bounding_box; }
 
+    const Material* getMaterial() const override { return m; }
+
     void getSurfaceProperties(const Vector3f& P, const Vector3f& I,
                               const uint32_t& index, const Vector2f& uv,
                               Vector3f& N, Vector2f& st) const

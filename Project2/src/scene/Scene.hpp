@@ -47,6 +47,14 @@ public:
     // PDF user-control requirement (i): camera. Owned externally.
     const Camera* camera = nullptr;
 
+    // Optional caustic photon map. When set, surface integrands at non-delta
+    // hits include the gathered caustic flux. Indirect-bounce paths that
+    // immediately enter a specular surface are suppressed to avoid double
+    // counting the LSDE energy the photon map already provides.
+    const class PhotonMap* causticMap = nullptr;
+    int      causticPhotonCount = 0;        // 0 disables the photon pass
+    float    causticGatherRadius = 0.006f;
+
     Scene(int w, int h) : width(w), height(h) {}
 
     void Add(Object* object) { objects.push_back(object); }
