@@ -8,7 +8,7 @@ render {
     width   = 1280
     height  = 960
     spp     = 256
-    depth   = 10
+    depth   = 25
     shadows = true
     bg      = 0.000 0.000 0.000
     exposure = 1.20
@@ -20,8 +20,8 @@ render {
     denoiseSigmaColor = 0.10
     denoiseSigmaNormal = 0.10
     denoiseSigmaAlbedo = 0.12
-    causticPhotons       = 4000
-    causticGatherRadius  = 0.0005
+    causticPhotons       = 2000000
+    causticGatherRadius  = 0.0001
     causticBoost         = 6.0
 }
 
@@ -46,11 +46,11 @@ mesh "diamond/diamond.obj" {
     ior                = 2.42
     dispersion         = 0.07
     flatNormals        = true
-    shadowTransmission = 0.0
+    shadowTransmission = 0.4
     shadowTint         = 1.000 1.000 1.000
-    offset             = -0.040 0.0092 0.044
-    rotation           = 18.000 28.000 -31.000
-    scale              = 1.900 1.900 1.900
+    offset             = -0.040 0.0116 0.044
+    rotation           = 42.000 28.000 -10.000
+    scale              = 2.128 2.128 2.128
 }
 
 mesh "Rock 2/Lake Erie Rock 2.obj" {
@@ -67,7 +67,7 @@ light {
     pos       = -0.070 0.135 -0.045
     normal    = 0.320 -0.930 0.180
     size      = 0.030 0.030 0.0
-    emission  = 1.00 0.99 0.97
+    emission  = 0.95 0.86 1.00
     intensity = 180.0
     enabled   = true
 }
@@ -78,7 +78,7 @@ light {
     normal    = 0.000 -0.280 0.960
     size      = 0.060 0.040 0.0
     emission  = 0.88 0.92 1.00
-    intensity = 8.0
+    intensity = 4.0
     enabled   = false
 }
 
