@@ -86,6 +86,7 @@ struct SceneDescriptor {
     Vector3f background = {0.0f, 0.0f, 0.0f};
     int      causticPhotons = 0;            // 0 disables caustic photon mapping
     float    causticGatherRadius = 0.006f;  // photon-map lookup radius
+    float    causticBoost = 1.0f;           // artistic multiplier on caustic energy
 };
 
 // CLI / runtime knobs that win over the .scene file when set. Built by

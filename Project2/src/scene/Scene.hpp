@@ -54,6 +54,10 @@ public:
     const class PhotonMap* causticMap = nullptr;
     int      causticPhotonCount = 0;        // 0 disables the photon pass
     float    causticGatherRadius = 0.006f;
+    // Artistic multiplier on the photon-map caustic contribution. Defaults
+    // to 1.0 (physical). Bump above 1 for the stylised "diamond glow" look
+    // when the area-light geometry can't deliver enough focused energy.
+    float    causticBoost = 1.0f;
 
     Scene(int w, int h) : width(w), height(h) {}
 

@@ -22,6 +22,7 @@ render {
     denoiseSigmaAlbedo = 0.12
     causticPhotons       = 4000
     causticGatherRadius  = 0.0005
+    causticBoost         = 6.0
 }
 
 camera {
@@ -43,7 +44,7 @@ mesh "diamond/diamond.obj" {
     material           = GLASS
     color              = 1.000 1.000 1.000
     ior                = 2.42
-    dispersion         = 0.025
+    dispersion         = 0.07
     flatNormals        = true
     shadowTransmission = 0.0
     shadowTint         = 1.000 1.000 1.000
@@ -65,9 +66,9 @@ light {
     type      = AREA_RECT
     pos       = -0.070 0.135 -0.045
     normal    = 0.320 -0.930 0.180
-    size      = 0.085 0.085 0.0
+    size      = 0.030 0.030 0.0
     emission  = 1.00 0.99 0.97
-    intensity = 44.0
+    intensity = 180.0
     enabled   = true
 }
 
@@ -78,7 +79,7 @@ light {
     size      = 0.060 0.040 0.0
     emission  = 0.88 0.92 1.00
     intensity = 8.0
-    enabled   = true
+    enabled   = false
 }
 
 light {
@@ -87,5 +88,5 @@ light {
     radius    = 0.012
     emission  = 0.95 0.96 1.00
     intensity = 1.8
-    enabled   = true
+    enabled   = false
 }

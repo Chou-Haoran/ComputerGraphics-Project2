@@ -453,7 +453,7 @@ Vector3f Scene::castRay(const Ray& ray, int depth, int* pathFlags) const
     if (causticMap && causticMap->size() > 0) {
         Vector3f fluxDensity = causticMap->estimateFluxDensity(hitPoint, N,
                                                                 causticGatherRadius);
-        causticLight = fluxDensity * surfaceCol * (1.0f / static_cast<float>(M_PI));
+        causticLight = fluxDensity * surfaceCol * (causticBoost / static_cast<float>(M_PI));
     }
 
     return directLight + indirectLight + causticLight;

@@ -251,6 +251,7 @@ private:
             else if (f == "toneMap")  d.toneMap = parseBool();
             else if (f == "causticPhotons")        d.causticPhotons = parseInt();
             else if (f == "causticGatherRadius")   d.causticGatherRadius = parseNum();
+            else if (f == "causticBoost")          d.causticBoost = parseNum();
             else errorAt("unknown render field: " + f);
         }
     }
@@ -661,6 +662,7 @@ LoadedScene SceneLoader::load(const std::string& sceneDir,
     scene->backgroundColor = desc.background;
     scene->causticPhotonCount = std::max(0, desc.causticPhotons);
     scene->causticGatherRadius = std::max(1e-5f, desc.causticGatherRadius);
+    scene->causticBoost = std::max(0.0f, desc.causticBoost);
     scene->outputBaseName  = "output/" + viewName;
 
     std::unordered_map<std::string, Texture*> textureCache;
