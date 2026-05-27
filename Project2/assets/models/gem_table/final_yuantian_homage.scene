@@ -51,11 +51,9 @@ mesh "diamond/diamond.obj" {
 }
 
 mesh "Rock 2/Lake Erie Rock 2.obj" {
-    material           = MICROFACET
-    color              = 1.000 1.000 1.000
+    material           = DIFFUSE
+    color              = 0.20 0.220 0.240
     diffuseTex         = "Rock 2/Lake Erie Rock 2_1.jpg"
-    roughness          = 0.40
-    roughnessVariation = 0.06
     offset             = 0.040 0.0147 0.044
     rotation           = 75.000 15.000 45.000
     scale              = 0.0012 0.0012 0.0012
