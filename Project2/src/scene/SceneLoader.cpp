@@ -68,6 +68,7 @@ struct MaterialOverrideSpec {
     std::optional<std::string>  type;
     std::optional<Vector3f>     color;
     std::optional<float>        ior;
+    std::optional<float>        dispersion;
     std::optional<float>        metallic;
     std::optional<float>        roughness;
     std::optional<float>        Kd;
@@ -291,6 +292,7 @@ private:
             else if (f == "rotation")     m.rotation     = parseV3();
             else if (f == "scale")        m.scale        = parseV3();
             else if (f == "ior")          m.ior          = parseNum();
+            else if (f == "dispersion")   m.dispersion   = parseNum();
             else if (f == "metallic")     m.metallic     = parseNum();
             else if (f == "roughness")    m.roughness    = parseNum();
             else if (f == "emission")     m.emission     = parseV3();
@@ -423,6 +425,7 @@ private:
             if      (f == "type")                spec.type = parseMaterialType();
             else if (f == "color")               spec.color = parseV3();
             else if (f == "ior")                 spec.ior = parseNum();
+            else if (f == "dispersion")          spec.dispersion = parseNum();
             else if (f == "metallic")            spec.metallic = parseNum();
             else if (f == "roughness")           spec.roughness = parseNum();
             else if (f == "Kd")                  spec.Kd = parseNum();
@@ -720,6 +723,8 @@ LoadedScene SceneLoader::load(const std::string& sceneDir,
             config.color = color;
             config.ior = meshSpec.ior.value_or(
                 override && override->ior ? *override->ior : inferIor(srcMaterial));
+            config.dispersion = meshSpec.dispersion.value_or(
+                override && override->dispersion ? *override->dispersion : 0.0f);
             config.metallic = meshSpec.metallic.value_or(
                 override && override->metallic ? *override->metallic : 0.0f);
             config.roughness = meshSpec.roughness.value_or(

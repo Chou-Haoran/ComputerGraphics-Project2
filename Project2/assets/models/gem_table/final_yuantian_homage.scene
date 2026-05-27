@@ -26,9 +26,9 @@ camera {
     pos       = -0.150 0.150 0.200
     lookAt    = 0.016 0.005 0.005
     up        = 0.0 1.0 0.0
-    fov       = 38
+    fov       = 41
     aperture  = 0.0
-    focus     = 0.294
+    focus     = 0.265
 }
 
 mesh "stage.obj" {
@@ -41,10 +41,11 @@ mesh "diamond/diamond.obj" {
     material           = GLASS
     color              = 1.000 1.000 1.000
     ior                = 2.42
+    dispersion         = 0.025
     shadowTransmission = 0.96
     shadowTint         = 1.000 1.000 1.000
-    offset             = -0.020 0.0062 0.008
-    rotation           = 18.000 32.000 58.000
+    offset             = -0.040 0.0160 0.044
+    rotation           = 18.000 32.000 -15.000
     scale              = 1.900 1.900 1.900
 }
 
@@ -53,7 +54,7 @@ mesh "black_rock.obj" {
     color              = 0.060 0.065 0.072
     roughness          = 0.88
     roughnessVariation = 0.18
-    offset             = 0.052 0.000 0.010
+    offset             = 0.040 0.000 0.044
     rotation           = -8.000 24.000 -12.000
     scale              = 1.050 1.050 1.050
 }

@@ -272,7 +272,7 @@ int Scene::sampleAnalyticLight(float u, float& pickPdf) const
 // with analytic lights (point / spot / directional); indirect uses
 // cosine-weighted hemisphere + Russian Roulette. Mirror & glass branch out
 // with Fresnel-weighted reflection/refraction.
-Vector3f Scene::castRay(const Ray& ray, int depth) const
+Vector3f Scene::castRay(const Ray& ray, int depth, int* pathFlags) const
 {
     auto inter = depth == 0 ? intersectPrimary(ray) : intersect(ray);
 
@@ -306,7 +306,8 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
         if (dotProduct(N, viewDir) < 0.0f) N = -N;
     }
     float surfaceRoughness = inter.material->getRoughnessAt(st.x, st.y, roughnessFp.lod);
-    MaterialInteraction interaction = inter.material->resolveInteraction(ray.direction, N);
+    MaterialInteraction interaction = inter.material->resolveInteraction(
+        ray.direction, N, ray.spectralChannel);
     if (interaction.kind == MaterialInteractionKind::Emission) {
         return interaction.emission;
     }
@@ -319,9 +320,17 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
             const MaterialDeltaBounce& bounce = interaction.bounces[i];
             if (dotProduct(bounce.direction, bounce.direction) < EPSILON ||
                 dotProduct(bounce.throughput, bounce.throughput) < EPSILON) continue;
-            radiance += bounce.throughput *
-                        castRay(Ray(offsetRayOrigin(hitPoint, N, bounce.direction),
-                                    bounce.direction), depth + 1);
+            Ray childRay(offsetRayOrigin(hitPoint, N, bounce.direction),
+                         bounce.direction);
+            // Inherit the parent ray's channel unless this bounce was tagged
+            // by a dispersive split, in which case the child is locked to a
+            // wavelength so subsequent glass hits use that channel's IOR.
+            childRay.spectralChannel = bounce.channel >= 0 ? bounce.channel
+                                                            : ray.spectralChannel;
+            if (pathFlags && bounce.channel >= 0 && ray.spectralChannel < 0) {
+                *pathFlags |= PathFlagTouchedDispersion;
+            }
+            radiance += bounce.throughput * castRay(childRay, depth + 1, pathFlags);
         }
         return radiance;
     }
@@ -396,6 +405,7 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
         float    cosSample = std::max(0.0f, dotProduct(N, sampleDir));
         if (pdf > 1e-8f && cosSample > 0.0f) {
             Ray nextRay(offsetRayOrigin(hitPoint, N, sampleDir), sampleDir);
+            nextRay.spectralChannel = ray.spectralChannel;
             Intersection nextInter = intersect(nextRay);
             if (!nextInter.happened) {
                 Vector3f missRadiance(0.0f);
@@ -412,14 +422,14 @@ Vector3f Scene::castRay(const Ray& ray, int depth) const
                     Vector3f brdf = inter.material->eval(viewDir, sampleDir, N,
                                                          surfaceCol, surfaceRoughness,
                                                          surfaceMetallic);
-                    indirectLight = castRay(nextRay, depth + 1) *
+                    indirectLight = castRay(nextRay, depth + 1, pathFlags) *
                                     brdf * cosSample / (pdf * RussianRoulette);
                 }
             } else if (!nextInter.material->hasEmission()) {
                 Vector3f brdf = inter.material->eval(viewDir, sampleDir, N,
                                                      surfaceCol, surfaceRoughness,
                                                      surfaceMetallic);
-                indirectLight = castRay(nextRay, depth + 1) *
+                indirectLight = castRay(nextRay, depth + 1, pathFlags) *
                                 brdf * cosSample / (pdf * RussianRoulette);
             }
         }

@@ -16,19 +16,26 @@ enum class MaterialInteractionKind {
 struct MaterialDeltaBounce {
     Vector3f direction  = Vector3f(0.0f);
     Vector3f throughput = Vector3f(0.0f);
+    // -1 = inherit caller's channel; 0/1/2 = R/G/B (set by dispersive
+    // refraction so the spawned child ray is locked to one wavelength).
+    int      channel    = -1;
 };
 
 struct MaterialInteraction {
     MaterialInteractionKind kind = MaterialInteractionKind::Surface;
     Vector3f emission = Vector3f(0.0f);
     int bounceCount = 0;
-    MaterialDeltaBounce bounces[2];
+    // Up to 1 reflect + 3 dispersive refracts (R/G/B).
+    MaterialDeltaBounce bounces[4];
 };
 
 struct MaterialConfig {
     Vector3f color = Vector3f(0.0f);
     Vector3f emission = Vector3f(0.0f);
     float ior = 1.5f;
+    // Per-channel IOR offset for GLASS dispersion: ior(R/G/B) = ior + offset*{-1,0,+1}.
+    // 0 disables wavelength splitting and keeps refraction monochromatic.
+    float dispersion = 0.0f;
     float metallic = 0.0f;
     float Kd = 0.8f;
     float Ks = 0.2f;
@@ -62,7 +69,8 @@ public:
 
     virtual const std::string& typeName() const = 0;
     virtual MaterialInteraction resolveInteraction(const Vector3f& rayDir,
-                                                   const Vector3f& N) const;
+                                                   const Vector3f& N,
+                                                   int spectralChannel = -1) const;
     virtual Vector3f sample(const Vector3f& wi, const Vector3f& N,
                             const Vector3f& albedo, float rough,
                             float metallic) const = 0;
@@ -92,6 +100,7 @@ public:
     Vector3f m_color;
     Vector3f m_emission;
     float ior;
+    float dispersion;
     float metallic;
     float Kd;
     float Ks;

@@ -13,7 +13,8 @@ public:
     }
 
     MaterialInteraction resolveInteraction(const Vector3f& rayDir,
-                                           const Vector3f& N) const override
+                                           const Vector3f& N,
+                                           int /*spectralChannel*/) const override
     {
         MaterialInteraction interaction;
         interaction.kind = MaterialInteractionKind::Delta;

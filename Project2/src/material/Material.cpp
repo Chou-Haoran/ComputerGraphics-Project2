@@ -10,6 +10,7 @@ Material::Material(const MaterialConfig& config)
     : m_color(config.color),
       m_emission(config.emission),
       ior(config.ior),
+      dispersion(config.dispersion),
       metallic(config.metallic),
       Kd(config.Kd),
       Ks(config.Ks),
@@ -56,7 +57,7 @@ bool Material::hasEmission() const
     return dotProduct(m_emission, m_emission) > EPSILON;
 }
 
-MaterialInteraction Material::resolveInteraction(const Vector3f&, const Vector3f&) const
+MaterialInteraction Material::resolveInteraction(const Vector3f&, const Vector3f&, int) const
 {
     MaterialInteraction interaction;
     if (hasEmission()) {

@@ -125,12 +125,17 @@ void Renderer::Render(const Scene& scene, const Camera& camera)
                 }
 
                 Ray r = camera.generateRay(u, v, r1, r2);
-                Vector3f s = scene.castRay(r, 0);
+                int pathFlags = 0;
+                Vector3f s = scene.castRay(r, 0, &pathFlags);
                 // Per-sample radiance clamp to suppress specular-caustic
-                // fireflies (rare diffuse→glossy→light paths).
-                s.x = std::min(s.x, fireflyClamp);
-                s.y = std::min(s.y, fireflyClamp);
-                s.z = std::min(s.z, fireflyClamp);
+                // fireflies (rare diffuse→glossy→light paths). Skip the clamp
+                // for samples that went through dispersive refraction so we
+                // preserve the rainbow caustics that make a diamond sparkle.
+                if (!(pathFlags & Scene::PathFlagTouchedDispersion)) {
+                    s.x = std::min(s.x, fireflyClamp);
+                    s.y = std::min(s.y, fireflyClamp);
+                    s.z = std::min(s.z, fireflyClamp);
+                }
 
                 color += s;
                 ++sampleCount;

@@ -58,7 +58,14 @@ public:
     BVHAccel* bvh = nullptr;
     void buildBVH();
     void buildPrimaryRayAccel();
-    Vector3f castRay(const Ray& ray, int depth) const;
+    // Bits OR'd into *pathFlags during traversal so the renderer can decide
+    // post-hoc whether firefly clamping is safe for the sample. Currently
+    // only TouchedDispersion is used to keep caustic samples intact.
+    enum PathFlag : int {
+        PathFlagTouchedDispersion = 1 << 0
+    };
+
+    Vector3f castRay(const Ray& ray, int depth, int* pathFlags = nullptr) const;
     void sampleLight(Intersection& pos, float& pdf) const;
     int sampleAnalyticLight(float u, float& pickPdf) const;
 
