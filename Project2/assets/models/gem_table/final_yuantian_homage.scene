@@ -23,12 +23,12 @@ render {
 }
 
 camera {
-    pos       = 0.070 0.048 0.165
-    lookAt    = 0.004 0.012 0.000
+    pos       = -0.150 0.150 0.200
+    lookAt    = 0.016 0.005 0.005
     up        = 0.0 1.0 0.0
-    fov       = 31
+    fov       = 38
     aperture  = 0.0
-    focus     = 0.175
+    focus     = 0.294
 }
 
 mesh "stage.obj" {
