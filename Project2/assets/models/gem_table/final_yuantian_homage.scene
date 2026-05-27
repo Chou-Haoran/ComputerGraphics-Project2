@@ -43,21 +43,22 @@ mesh "diamond/diamond.obj" {
     ior                = 2.42
     dispersion         = 0.025
     flatNormals        = true
-    shadowTransmission = 0.96
+    shadowTransmission = 0.0
     shadowTint         = 1.000 1.000 1.000
-    offset             = -0.040 0.0160 0.044
-    rotation           = 18.000 32.000 -15.000
+    offset             = -0.040 0.0092 0.044
+    rotation           = 18.000 28.000 -31.000
     scale              = 1.900 1.900 1.900
 }
 
-mesh "black_rock.obj" {
+mesh "Rock 2/Lake Erie Rock 2.obj" {
     material           = MICROFACET
-    color              = 0.020 0.024 0.032
-    roughness          = 0.20
-    roughnessVariation = 0.08
-    offset             = 0.040 0.000 0.044
-    rotation           = -8.000 24.000 -12.000
-    scale              = 1.120 1.120 1.120
+    color              = 1.000 1.000 1.000
+    diffuseTex         = "Rock 2/Lake Erie Rock 2_1.jpg"
+    roughness          = 0.40
+    roughnessVariation = 0.06
+    offset             = 0.040 0.0147 0.044
+    rotation           = 75.000 15.000 45.000
+    scale              = 0.0012 0.0012 0.0012
 }
 
 light {
