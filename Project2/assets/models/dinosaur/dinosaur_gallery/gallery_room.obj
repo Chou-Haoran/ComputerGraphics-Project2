@@ -1,0 +1,35 @@
+mtllib gallery_room.mtl
+o gallery_room
+
+v -28.0 0.0 14.0
+v 22.0 0.0 14.0
+v 22.0 0.0 -18.0
+v -28.0 0.0 -18.0
+v -28.0 16.0 -18.0
+v 22.0 16.0 -18.0
+v 22.0 16.0 14.0
+v -28.0 16.0 14.0
+v 4.0 0.0 -6.0
+v 4.0 0.0 -18.0
+v 4.0 16.0 -18.0
+v 4.0 16.0 -6.0
+
+vt 0.0 0.0
+vt 1.0 0.0
+vt 1.0 1.0
+vt 0.0 1.0
+
+usemtl floor
+f 1/1 4/2 3/3 2/4
+
+usemtl back_wall
+f 4/1 3/2 6/3 5/4
+
+usemtl right_wall
+f 2/1 7/2 6/3 3/4
+
+usemtl ceiling
+f 8/1 5/2 6/3 7/4
+
+usemtl partition
+f 9/1 12/2 11/3 10/4

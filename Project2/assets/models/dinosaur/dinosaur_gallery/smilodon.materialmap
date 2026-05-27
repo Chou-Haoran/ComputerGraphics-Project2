@@ -1,0 +1,18 @@
+materialMap {
+    defaultType = MICROFACET
+    defaultRoughnessMin = 0.32
+}
+
+mtl "material_0" {
+    type = MICROFACET
+    color = 0.55 0.48 0.34
+    roughness = 0.40
+    Ks = 0.28
+}
+
+mtl "material_1" {
+    type = MICROFACET
+    color = 0.46 0.40 0.30
+    roughness = 0.48
+    Ks = 0.20
+}

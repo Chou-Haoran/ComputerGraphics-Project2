@@ -1,0 +1,113 @@
+# Homage to Beat Kueng's dinosaur gallery image using the two provided
+# skeleton scans. Run from Project2/:
+#   ./build/Project2Renderer assets/models/dinosaur/dinosaur_gallery beat_kueng_homage 1280x720 96
+
+render {
+    width   = 1280
+    height  = 720
+    spp     = 96
+    depth   = 8
+    shadows = true
+    bg      = 0.018 0.024 0.032
+    exposure = 1.55
+    toneMap = true
+    adaptiveSampling = false
+    denoise = true
+    denoiseRadius = 2
+    denoiseSigmaSpatial = 1.2
+    denoiseSigmaColor = 0.08
+    denoiseSigmaNormal = 0.10
+    denoiseSigmaAlbedo = 0.12
+}
+
+envmap "../../../envmaps/debug_gradient.hdr" {
+    intensity = 1.4
+}
+
+camera {
+    pos       = -4.8 7.5 19.8
+    lookAt    = 10.8 7.6 -1.2
+    up        = 0.0 1.0 0.0
+    fov       = 28
+    aperture  = 0.0
+    focus     = 32.0
+}
+
+mesh "gallery_room.obj" {
+    materialMap = "gallery_room.materialmap"
+}
+
+mesh "display_plinths.obj" {
+    materialMap = "display_plinths.materialmap"
+}
+
+mesh "../tyrannosaurus-rex-skeleton/source/dyno_tex.obj" {
+    material    = MICROFACET
+    color       = 0.63 0.56 0.41
+    roughness   = 0.34
+    emission    = 0.036 0.030 0.022
+    offset      = 9.8 6.782 -1.2
+    rotation    = 0.0 176.0 0.0
+    scale       = 0.65 0.65 0.65
+}
+
+mesh "../saber-toothed-cat-nhmw-geo-191001020001/source/Smilodon_low res/Smilodon_low res.obj" {
+    material    = MICROFACET
+    color       = 0.52 0.45 0.33
+    roughness   = 0.42
+    emission    = 0.014 0.012 0.010
+    offset      = -15.0 3.040 16.5
+    rotation    = 0.0 104.0 0.0
+    scale       = 0.0070 0.0070 0.0070
+}
+
+light {
+    type      = AREA_RECT
+    pos       = -11.5 15.6 -15.8
+    normal    = 0.000 -1.000 0.000
+    size      = 28.0 1.1 0.0
+    emission  = 0.86 0.93 1.00
+    intensity = 260.0
+    showModel = true
+    enabled   = true
+}
+
+light {
+    type      = AREA_RECT
+    pos       = 4.05 8.6 -15.8
+    normal    = 0.000 0.000 1.000
+    size      = 0.35 11.6 0.0
+    emission  = 0.88 0.95 1.00
+    intensity = 320.0
+    showModel = true
+    enabled   = true
+}
+
+light {
+    type      = AREA_RECT
+    pos       = 12.5 13.4 -3.8
+    normal    = 0.000 -1.000 0.000
+    size      = 12.0 7.5 0.0
+    emission  = 0.94 0.97 1.00
+    intensity = 140.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_RECT
+    pos       = -18.0 9.8 6.5
+    normal    = 0.760 -0.240 -0.600
+    size      = 8.5 8.5 0.0
+    emission  = 0.82 0.89 1.00
+    intensity = 70.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = 20.0 9.2 -0.8
+    radius    = 1.2
+    emission  = 1.00 0.95 0.84
+    intensity = 24.0
+    enabled   = true
+}

@@ -1,82 +1,64 @@
-# 答辩讲稿 — Monte Carlo Path Tracer（6页 · < 4分钟）
+# Presentation Script — Monte Carlo Path Tracer (main script ends at Slide 5)
 
-> 与 `ppt_prompts.md` 的 6 张幻灯片一一对应。正文为口语化中文，括号内为预计用时。
-> 合计约 3 分 45 秒，预留 15 秒缓冲。建议排练 2-3 遍控制节奏。
->
-> **时间分配**：封面(30s) + 管线(50s) + 材质(45s) + 光照(45s) + 结果(40s) + 限制(30s)
+> Team Collision: Jiandi Mu, Haoran Zhou, Ziyu Zhou, Kaiwei Wang.
 
----
-
-## Slide 1 — 封面 + 动机（约 30 秒）
-
-各位老师好，我今天汇报的题目是「Monte Carlo Path Tracer — 从渲染方程到物理真实感绘制」。
-
-**（指向幻灯片下半部分）** 传统光栅化渲染有几个根本性局限：没有真正的全局光照——间接漫反射需要烘焙光照贴图来模拟，反射折射依赖各种 screen-space 近似。而 Path Tracing 直接求解 Kajiya 渲染方程，把所有光路——直接光照、间接弹射、焦散、镜面反射——统一到一个框架里。这就是本项目要做的事：从零实现一个物理正确的路径追踪渲染器。
+> Main version: finish on Slide 5 to stay safely within the 4-minute limit.  
+> Slide 6 is kept only as an optional backup if there is extra time.
 
 ---
 
-## Slide 2 — 渲染管线概览（约 50 秒）
+## Slide 1 — Cover (~8 sec)
 
-这是我们的完整渲染管线。
-
-**（指向流程图）** 对每个像素发射多条光线进入场景。首先用 BVH 做加速求交——在 40 万三角面的场景中，单次求交只需约 28 毫秒。找到交点后，评估直接光照——这里用了多重重要性采样，把光源采样和 BSDF 采样用 Power Heuristic 加权组合，这是降低方差的核心技术。
-
-然后是间接弹射——通过 BSDF 重要性采样出射方向并递归追踪，用俄罗斯轮盘赌做无偏终止。最后累加所有路径的辐射亮度，做色调映射输出。
-
-**（指向右侧卡片）** 整个管线支持 6 种物理材质、BVH 加速、以及 MIS。项目用 C++17 实现，OpenMP 多线程并行，总共约 4000 行代码。
+Good morning everyone. We are Team Collision. This is our Project 2 report, and our motivational image is a Vicorian style room, we will show that at the result part.
 
 ---
 
-## Slide 3 — 材质系统与 GGX 微表面（约 45 秒）
+## Slide 2 — Rendering Pipeline Overview (~28 sec)
 
-材质系统基于统一的 BSDF 接口设计——sample、eval、pdf 三个虚函数，所有材质都从这个基类派生。
+This slide shows our rendering pipeline. For each pixel, we generate camera rays, trace them into the scene, and use a BVH (Bounding Volume Hierarchy) for efficient intersection.
 
-**（指向材质网格）** 我们支持 6 种材质：最简单的 Lambertian 漫反射；主力是 GGX Microfacet——完整的 Cook-Torrance 微表面模型；还有纯金属、镜面、玻璃和自发光。材质工厂用了 C++ 静态自注册——加新材质只需要写一个 cpp 文件，不用改任何中央调度代码。
-
-**（指向公式卡片）** GGX 的核心公式在这里。BRDF 分漫反射和镜面反射两部分，用 metallic 参数混合。镜面部分包含 D·G·F 三项——D 是 GGX 法线分布，α=roughness² 控制高光锐利度；G 是 Smith-Schlick 几何遮蔽；F 是 Schlick 菲涅尔近似。roughness 越低，高光越集中。
+At each hit point, direct lighting uses MIS (Multiple Importance Sampling), combining light sampling and BSDF (Bidirectional Scattering Distribution Function) sampling. Indirect lighting comes from recursive path tracing, with Russian Roulette for termination.
 
 ---
 
-## Slide 4 — 光源与环境光照（约 45 秒）
+## Slide 3 — Material System & GGX Microfacet (~25 sec)
 
-光照系统分两部分。
+All materials share one BSDF interface: `sample`, `eval`, and `pdf` (probability density function). We support six types of material: Diffuse, Microfacet, Metal, Mirror, Glass, and Emit.
 
-**（指向上半部分）** 分析光源——7 种类型，从矩形面光到平行光全覆盖。按亮度做 CDF 重要性采样，亮的光源被选中的概率更高。阴影光线支持半透明穿透——最多追踪 8 层，累积有色透射率，让彩色玻璃和窗帘成为可能。
-
-**（指向下半部分）** 第二部分是 HDR 环境贴图。加载等距柱状投影的 .hdr 文件，构建 2D 亮度加权 CDF 做重要性采样——亮度越高的天空区域被采样的概率越大，比均匀采样方差低得多。
-
-**（指向对比图）** 看右边对比——没有环境贴图时室内暗部完全黑；加上环境贴图并用 MIS 结合 BSDF 采样后，暗部有了自然的柔光照亮。这是场景真实感的关键来源。
+Our main shading model is GGX (Trowbridge-Reitz) microfacet with the standard D, G, and F terms. Low roughness gives sharp highlights, while high roughness gives softer reflections.
 
 ---
 
-## Slide 5 — 渲染结果（约 40 秒）
+## Slide 4 — Lighting & Environment Illumination (~22 sec)
 
-这是两个场景的最终渲染效果。
+For lighting, we support seven analytical light types, sampled by luminance.
 
-**（指向上半部分）** 桌面打字机场景——15 万三角面。三个视角可以看到 GGX 金属高光、不同光照角度下的材质表现、以及多种光源类型的对比。
-
-**（指向下半部分）** Blender 复古房间——40 万以上三角面，更复杂。Essential 版只保留核心家具，Grouped 版是完整房间。可以看到环境光从窗户射入、在木地板和墙壁之间多次弹射产生的柔和间接光照。所有图片都经过联合双边滤波降噪处理。
+We also support HDR (High Dynamic Range) environment maps with luminance-weighted sampling. Together with MIS, this reduces noise and gives more natural soft light in indoor scenes.
 
 ---
 
-## Slide 6 — 限制与改进方向（约 30 秒）
+## Slide 5 — Results (~40 sec)
 
-最后总结一下。
+Here are our results.
 
-**（指向左侧限制）** 目前项目有三个主要限制：景深字段已预留但透镜采样未实现；BVH 使用 NAIVE 中位数分割而非更优的 SAH；不支持体积散射介质。
+The first scene is the desktop typewriter. The front view shows GGX highlights and soft contact shadows. The side view provides the second viewpoint with a desk. The lampshade shows translucent transmission and texture detail.
 
-**（指向右侧亮点）** 但核心成果是完整的——从零构建了支持 6 种 BSDF、7 种光源类型、HDR 环境光、多重重要性采样、BVH 加速和降噪的物理真实感渲染器，能处理数十万三角面的复杂场景。
+The second scene is the retro room. The Essential version shows indirect global illumination on the main furniture. The Grouped version extends this to the full room. The Denoised result reduces noise while preserving edges and shadows.
 
-**（指向 roadmap）** 未来方向：实现薄透镜景深、SAH BVH、体积散射，以及长期目标 GPU 加速。
-
-我的汇报就到这里，谢谢各位老师，欢迎提问。
+That concludes our main system and results. Thank you.
 
 ---
 
-## 附：预期 Q&A 速答
+## Slide 6 — Optional Backup Only (~15 sec if time remains)
 
-- **为什么 NAIVE 不用 SAH？** SAH 构建需要评估 O(N log N) 种分割方案，实现更复杂。当前 NAIVE 在测试场景中已经够快，SAH 接口已预留。
-- **MIS 为什么 β=2？** Veach 论文的理论结果——β=2 在实践中方差最低。β 越大越信任高 PDF 策略。
-- **Fireflies 怎么处理？** 两阶段——先 clamp 单次路径贡献到 1.5 削极端值，再用俄罗斯轮盘赌无偏终止低贡献路径。
-- **自适应采样怎么判断收敛？** Welford 在线算法维护每像素均值方差，变异系数低于阈值(0.08)时停止。
-- **为什么自研 .scene DSL 而不用 glTF？** glTF 解析复杂、引入大量依赖。自研 DSL 只有 400 行，零外部依赖，解析极快，足以覆盖项目需求。
+If there is still time, we can briefly mention three limitations: depth of field is not implemented yet, the BVH still uses naive median split rather than SAH (Surface Area Heuristic), and volumetric scattering is not supported. Future work would be thin-lens depth of field, SAH BVH optimisation, volumetric effects, and GPU acceleration.
+
+---
+
+## Appendix: Quick Q&A
+
+- **Why NAIVE not SAH?** SAH adds complexity; NAIVE works well on our scenes; the SAH interface is stubbed out.
+- **Why β=2?** Veach's thesis — β=2 minimises variance in practice.
+- **Fireflies?** Per-sample clamp at 1.5 plus Russian Roulette on low-throughput paths.
+- **Adaptive sampling?** Welford's online algorithm; stops when coefficient of variation drops below 0.08.
+- **Custom .scene DSL (domain-specific language)?** glTF (GL Transmission Format) is heavy with dependencies; our DSL is ~400 lines, zero deps.

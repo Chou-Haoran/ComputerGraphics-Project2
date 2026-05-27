@@ -1,0 +1,11 @@
+newmtl plinth_body
+Ka 0.16 0.18 0.16
+Kd 0.58 0.64 0.58
+Ks 0.10 0.10 0.10
+Ns 48
+
+newmtl plinth_trim
+Ka 0.18 0.18 0.16
+Kd 0.72 0.76 0.68
+Ks 0.18 0.18 0.18
+Ns 88

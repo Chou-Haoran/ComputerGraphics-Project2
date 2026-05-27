@@ -1,0 +1,88 @@
+# Homage setup for docs/motivational/final_yuantian.png.
+# Focuses on matching composition and lighting structure with the current renderer.
+#
+# Run from Project2/:
+#   ./build/Project2Renderer assets/models/gem_table final_yuantian_homage 1280x960 256
+
+render {
+    width   = 1280
+    height  = 960
+    spp     = 256
+    depth   = 10
+    shadows = true
+    bg      = 0.000 0.000 0.000
+    exposure = 1.20
+    toneMap = true
+    adaptiveSampling = false
+    denoise = true
+    denoiseRadius = 2
+    denoiseSigmaSpatial = 1.4
+    denoiseSigmaColor = 0.10
+    denoiseSigmaNormal = 0.10
+    denoiseSigmaAlbedo = 0.12
+}
+
+camera {
+    pos       = 0.070 0.048 0.165
+    lookAt    = 0.004 0.012 0.000
+    up        = 0.0 1.0 0.0
+    fov       = 31
+    aperture  = 0.0
+    focus     = 0.175
+}
+
+mesh "stage.obj" {
+    material  = MICROFACET
+    color     = 0.860 0.868 0.895
+    roughness = 0.92
+}
+
+mesh "diamond/diamond.obj" {
+    material           = GLASS
+    color              = 1.000 1.000 1.000
+    ior                = 2.42
+    shadowTransmission = 0.96
+    shadowTint         = 1.000 1.000 1.000
+    offset             = -0.020 0.0062 0.008
+    rotation           = 18.000 32.000 58.000
+    scale              = 1.900 1.900 1.900
+}
+
+mesh "black_rock.obj" {
+    material           = MICROFACET
+    color              = 0.060 0.065 0.072
+    roughness          = 0.88
+    roughnessVariation = 0.18
+    offset             = 0.052 0.000 0.010
+    rotation           = -8.000 24.000 -12.000
+    scale              = 1.050 1.050 1.050
+}
+
+light {
+    type      = AREA_RECT
+    pos       = -0.070 0.135 -0.045
+    normal    = 0.320 -0.930 0.180
+    size      = 0.085 0.085 0.0
+    emission  = 1.00 0.99 0.97
+    intensity = 44.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_RECT
+    pos       = -0.010 0.090 -0.085
+    normal    = 0.000 -0.280 0.960
+    size      = 0.060 0.040 0.0
+    emission  = 0.88 0.92 1.00
+    intensity = 8.0
+    enabled   = true
+}
+
+light {
+    type      = AREA_SPHERE
+    pos       = 0.095 0.072 -0.010
+    radius    = 0.012
+    emission  = 0.95 0.96 1.00
+    intensity = 1.8
+    enabled   = true
+}

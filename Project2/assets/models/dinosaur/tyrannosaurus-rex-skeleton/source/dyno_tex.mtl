@@ -1,0 +1,19 @@
+newmtl dyno_tex_Material
+Ka 0.20 0.18 0.15
+Kd 1.00 1.00 1.00
+Ks 0.28 0.28 0.28
+Ns 120
+Ni 1.50
+d 1.0
+illum 2
+map_Kd ../textures/dyno-ps.jpg
+
+newmtl dyno_tex_Material_u1_v1
+Ka 0.20 0.18 0.15
+Kd 1.00 1.00 1.00
+Ks 0.28 0.28 0.28
+Ns 120
+Ni 1.50
+d 1.0
+illum 2
+map_Kd ../textures/dyno-ps.jpg

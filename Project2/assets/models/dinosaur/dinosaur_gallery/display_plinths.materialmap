@@ -1,0 +1,20 @@
+materialMap {
+    defaultType = MICROFACET
+    defaultRoughnessMin = 0.18
+}
+
+mtl "plinth_body" {
+    type = MICROFACET
+    color = 0.57 0.64 0.58
+    roughness = 0.30
+    Ks = 0.12
+    emission = 0.010 0.011 0.010
+}
+
+mtl "plinth_trim" {
+    type = MICROFACET
+    color = 0.72 0.76 0.68
+    roughness = 0.22
+    Ks = 0.18
+    emission = 0.012 0.013 0.011
+}
