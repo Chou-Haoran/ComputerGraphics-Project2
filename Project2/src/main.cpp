@@ -57,6 +57,7 @@ bool parseArgs(int argc, char** argv, CliArgs& a) {
         else if (s.rfind("--envmap=", 0) == 0)    a.overrides.envmapPath = s.substr(9);
         else if (s.rfind("--aperture=", 0) == 0)  a.overrides.aperture = std::stof(s.substr(11));
         else if (s.rfind("--focus=", 0) == 0)     a.overrides.focusDist = std::stof(s.substr(8));
+        else if (s.rfind("--output=", 0) == 0)    a.overrides.outputName = s.substr(9);
         else { std::cerr << "Unknown flag: " << s << "\n"; return false; }
     }
     return true;

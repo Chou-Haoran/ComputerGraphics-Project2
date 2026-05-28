@@ -663,7 +663,7 @@ LoadedScene SceneLoader::load(const std::string& sceneDir,
     scene->causticPhotonCount = std::max(0, desc.causticPhotons);
     scene->causticGatherRadius = std::max(1e-5f, desc.causticGatherRadius);
     scene->causticBoost = std::max(0.0f, desc.causticBoost);
-    scene->outputBaseName  = "output/" + viewName;
+    scene->outputBaseName  = "output/" + (overrides.outputName.value_or(viewName));
 
     std::unordered_map<std::string, Texture*> textureCache;
     auto loadTextureCached = [&](const fs::path& texPath) -> Texture* {

@@ -100,6 +100,7 @@ struct LoadOverrides {
     std::optional<std::string> envmapPath;
     std::optional<float>       aperture;
     std::optional<float>       focusDist;
+    std::optional<std::string> outputName;   // CLI override for outputBaseName
 };
 
 // Bundles every owned heap resource so main.cpp keeps it alive until
