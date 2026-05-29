@@ -8,21 +8,22 @@ render {
     width   = 1280
     height  = 960
     spp     = 256
-    depth   = 48
+    depth   = 64
     shadows = true
     bg      = 0.015 0.018 0.022
     exposure = 0.85
     toneMap = true
     adaptiveSampling = false
     denoise = true
-    denoiseRadius = 2
+    denoiseRadius = 1
     denoiseSigmaSpatial = 1.4
-    denoiseSigmaColor = 0.10
+    denoiseSigmaColor = 0.02
     denoiseSigmaNormal = 0.10
     denoiseSigmaAlbedo = 0.12
-    causticPhotons       = 8000000
-    causticGatherRadius  = 0.0010
-    causticBoost         = 6.5
+    causticPhotons       = 4000000
+    # causticGatherRadius  = 0.00015
+    causticGatherRadius  = 0.01
+    causticBoost         = 2.5
 }
 
 camera {
@@ -43,10 +44,10 @@ mesh "stage.obj" {
 mesh "diamond/diamond.obj" {
     material           = GLASS
     color              = 1.000 1.000 1.000
-    ior                = 2.0
-    dispersion         = 0.5
+    ior                = 2.3
+    dispersion         = 0.3
     flatNormals        = true
-    shadowTransmission = 0.4
+    shadowTransmission = 0.6
     shadowTint         = 1.000 1.000 1.000
     offset             = -0.040 0.0116 0.044
     rotation           = 42.000 28.000 -10.000
